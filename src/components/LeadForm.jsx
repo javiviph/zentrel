@@ -5,18 +5,14 @@ const LeadForm = ({ calculatorData, recommendedPack }) => {
     const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
+    const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
-
         try {
             const webhookUrl = import.meta.env.VITE_N8N_WEBHOOK_URL;
             const checkoutUrl = import.meta.env.VITE_LEMON_SQUEEZY_URL;
-
             const payload = {
                 name: formData.name,
                 phone: formData.phone,
@@ -28,95 +24,143 @@ const LeadForm = ({ calculatorData, recommendedPack }) => {
                 missedCalls: calculatorData?.missedCalls || 0,
                 recommendedPack: recommendedPack?.name || 'N/A'
             };
-
             if (webhookUrl) {
                 await fetch(webhookUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
-                }).catch(err => console.error("Webhook submission failed", err));
+                }).catch(() => { });
             }
-
             if (checkoutUrl) {
-                // Here you could append pass-through variables for the agent like ?checkout[custom][agent_id]=...
-                // For now, redirecting to the main URL as specified
                 window.location.href = checkoutUrl;
             } else {
-                alert("Configura VITE_LEMON_SQUEEZY_URL en el archivo .env");
+                alert('Configura VITE_LEMON_SQUEEZY_URL en el archivo .env');
             }
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setIsSubmitting(false);
-        }
+        } catch { /* silent */ }
+        finally { setIsSubmitting(false); }
     };
 
-    const buttonText = recommendedPack
-        ? `Activar mi ${recommendedPack.name} ahora`
-        : 'Activar mi Pack ahora';
+    const packName = recommendedPack?.name || 'tu Pack';
+    const packColor = recommendedPack?.color || '#00CC66';
 
     return (
-        <section className="w-full max-w-xl mx-auto px-4 py-8 mb-20 relative z-10" id="lead-form">
+        <section className="relative w-full max-w-5xl mx-auto px-4 py-8 mb-24" id="lead-form">
+            {/* Section label */}
+            <div className="flex items-center gap-2 mb-6">
+                <div className="w-1.5 h-4 rounded-full bg-emerald-500"></div>
+                <span className="text-xs font-semibold uppercase tracking-widest text-white/40">Activar ahora</span>
+            </div>
+
             <Motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.2 }}
-                className="bg-black border border-zinc-800 rounded-3xl p-8 shadow-2xl"
+                transition={{ duration: 0.5 }}
+                className="grid grid-cols-1 md:grid-cols-2 gap-0 rounded-3xl overflow-hidden"
+                style={{ border: '1px solid rgba(255,255,255,0.07)' }}
             >
-                <h3 className="text-2xl font-bold mb-6 text-center text-white">Únete a Zentrel hoy</h3>
-                <p className="text-zinc-400 text-center mb-8 text-sm">
-                    Déjanos tus datos, nuestro equipo se pondrá en contacto inmediatamente para configurar tu infraestructura y detener las pérdidas.
-                </p>
+                {/* Left: value prop panel */}
+                <div className="relative px-8 py-10 flex flex-col justify-between overflow-hidden"
+                    style={{ background: 'linear-gradient(160deg, rgba(0,180,80,0.12) 0%, rgba(0,0,0,0) 70%)', borderRight: '1px solid rgba(255,255,255,0.07)' }}>
+                    {/* Glow */}
+                    <div className="absolute -top-16 -left-16 w-64 h-64 rounded-full pointer-events-none"
+                        style={{ background: 'radial-gradient(circle, rgba(0,180,80,0.15) 0%, transparent 70%)' }}></div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="block text-sm text-zinc-400 uppercase tracking-widest font-semibold mb-2">Nombre Completo</label>
-                        <input
-                            type="text"
-                            name="name"
-                            required
-                            value={formData.name}
-                            onChange={handleChange}
-                            placeholder="Ej. Juan Pérez"
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
-                        />
+                    <div className="relative z-10">
+                        <div className="text-emerald-400 text-xs font-semibold uppercase tracking-widest mb-4">¿Qué obtienes?</div>
+                        <h2 className="text-2xl sm:text-3xl font-black mb-6 leading-tight">
+                            Empieza a recuperar ingresos<br />
+                            <span className="text-emerald-400">desde el primer día</span>
+                        </h2>
+                        <ul className="space-y-4">
+                            {[
+                                'Recepcionista IA configurada en 48h',
+                                'Sin permanencias ni contratos ocultos',
+                                'Tu IA aprende de tu negocio',
+                                'Notificaciones en tiempo real',
+                            ].map((item) => (
+                                <li key={item} className="flex items-start gap-3 text-white/60 text-sm">
+                                    <svg className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                                    {item}
+                                </li>
+                            ))}
+                        </ul>
                     </div>
 
-                    <div>
-                        <label className="block text-sm text-zinc-400 uppercase tracking-widest font-semibold mb-2">Email Profesional</label>
-                        <input
-                            type="email"
-                            name="email"
-                            required
-                            value={formData.email}
-                            onChange={handleChange}
-                            placeholder="juan@empresa.com"
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
-                        />
-                    </div>
+                    {/* Stat */}
+                    {calculatorData?.maxLoss > 0 && (
+                        <div className="relative z-10 mt-8 rounded-xl p-4"
+                            style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,204,102,0.2)' }}>
+                            <div className="text-xs text-white/30 uppercase tracking-widest mb-1">Tu estimación mensual</div>
+                            <div className="text-xl font-black font-mono" style={{ color: packColor }}>
+                                {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(calculatorData.maxLoss)}
+                                <span className="text-white/30 text-sm font-normal"> recuperables</span>
+                            </div>
+                        </div>
+                    )}
+                </div>
 
-                    <div>
-                        <label className="block text-sm text-zinc-400 uppercase tracking-widest font-semibold mb-2">Teléfono (WhatsApp)</label>
-                        <input
-                            type="tel"
-                            name="phone"
-                            required
-                            value={formData.phone}
-                            onChange={handleChange}
-                            placeholder="+34 600 000 000"
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
-                        />
-                    </div>
+                {/* Right: form */}
+                <div className="px-8 py-10" style={{ background: 'rgba(255,255,255,0.02)' }}>
+                    <h3 className="text-lg font-bold text-white mb-1">Activa {packName}</h3>
+                    <p className="text-white/40 text-xs mb-7">Nuestro equipo te contactará en menos de 2 horas.</p>
 
-                    <button
-                        type="submit"
-                        disabled={isSubmitting}
-                        className="w-full bg-white text-black font-bold text-sm md:text-base py-4 rounded-xl hover:bg-zinc-200 transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider relative overflow-hidden group"
-                    >
-                        <span className="relative z-10">{isSubmitting ? 'Procesando...' : buttonText}</span>
-                        <div className="absolute inset-0 bg-green-400 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 opacity-20"></div>
-                    </button>
-                </form>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                        {[
+                            { name: 'name', label: 'Nombre Completo', type: 'text', placeholder: 'Juan García' },
+                            { name: 'email', label: 'Email Profesional', type: 'email', placeholder: 'juan@clinica.com' },
+                            { name: 'phone', label: 'WhatsApp', type: 'tel', placeholder: '+34 600 000 000' },
+                        ].map(({ name, label, type, placeholder }) => (
+                            <div key={name}>
+                                <label className="block text-xs font-semibold uppercase tracking-widest text-white/30 mb-1.5">
+                                    {label}
+                                </label>
+                                <input
+                                    type={type}
+                                    name={name}
+                                    required
+                                    value={formData[name]}
+                                    onChange={handleChange}
+                                    placeholder={placeholder}
+                                    className="w-full rounded-xl px-4 py-3 text-sm text-white placeholder-white/20 outline-none transition-all duration-200"
+                                    style={{
+                                        background: 'rgba(255,255,255,0.04)',
+                                        border: '1px solid rgba(255,255,255,0.08)',
+                                    }}
+                                    onFocus={(e) => e.target.style.borderColor = 'rgba(0,204,102,0.4)'}
+                                    onBlur={(e) => e.target.style.borderColor = 'rgba(255,255,255,0.08)'}
+                                />
+                            </div>
+                        ))}
+
+                        <button
+                            type="submit"
+                            disabled={isSubmitting}
+                            className="w-full mt-2 flex items-center justify-center gap-3 py-4 rounded-xl font-bold text-sm uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:opacity-50"
+                            style={{
+                                background: '#00CC66',
+                                color: '#000',
+                                boxShadow: '0 0 30px rgba(0,204,102,0.25)',
+                            }}
+                        >
+                            {isSubmitting ? (
+                                <span>Procesando...</span>
+                            ) : (
+                                <>
+                                    <span>Activar mi {packName} ahora</span>
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                    </svg>
+                                </>
+                            )}
+                        </button>
+
+                        <p className="text-center text-white/20 text-xs pt-2">
+                            Sin permanencias · Cancela cuando quieras
+                        </p>
+                    </form>
+                </div>
             </Motion.div>
         </section>
     );
