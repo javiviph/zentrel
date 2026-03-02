@@ -89,16 +89,38 @@ const LeadForm = ({ calculatorData, recommendedPack }) => {
                     </div>
 
                     {/* Stat */}
-                    {calculatorData?.maxLoss > 0 && (
-                        <div className="relative z-10 mt-8 rounded-xl p-4"
-                            style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,204,102,0.2)' }}>
-                            <div className="text-xs text-white/30 uppercase tracking-widest mb-1">Tu estimación mensual</div>
-                            <div className="text-xl font-black font-mono" style={{ color: packColor }}>
-                                {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(calculatorData.maxLoss)}
-                                <span className="text-white/30 text-sm font-normal"> recuperables</span>
+                    {calculatorData?.maxLoss > 0 && (() => {
+                        const fmt = (v) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
+                        const packPrice = recommendedPack?.price ? Number(recommendedPack.price) : 0;
+                        const netSaving = Math.max(0, calculatorData.maxLoss - packPrice);
+                        return (
+                            <div className="relative z-10 mt-8 rounded-xl p-4"
+                                style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,204,102,0.2)' }}>
+                                <div className="text-xs text-white/30 uppercase tracking-widest mb-3">Tu ahorro mensual neto</div>
+
+                                {/* Gross recovery */}
+                                <div className="flex justify-between items-center mb-1">
+                                    <span className="text-xs text-white/30">Ingresos recuperados</span>
+                                    <span className="text-sm font-mono font-semibold text-white/50">{fmt(calculatorData.maxLoss)}</span>
+                                </div>
+
+                                {/* Deduction */}
+                                {packPrice > 0 && (
+                                    <div className="flex justify-between items-center pb-3 mb-3"
+                                        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
+                                        <span className="text-xs text-white/30">Coste mensual Zentrel</span>
+                                        <span className="text-sm font-mono text-red-400/60">− {fmt(packPrice)}</span>
+                                    </div>
+                                )}
+
+                                {/* Net saving */}
+                                <div className="flex justify-between items-center">
+                                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: packColor }}>Ganancia neta</span>
+                                    <span className="text-xl font-black font-mono" style={{ color: packColor }}>{fmt(netSaving)}</span>
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        );
+                    })()}
                 </div>
 
                 {/* Right: form */}
