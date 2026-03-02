@@ -294,7 +294,7 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                                 <div className="text-3xl sm:text-4xl font-black font-mono tabular-nums" style={{ color: '#FF8800' }}>
                                     <AnimatedNumber value={potentialLoss} />
                                 </div>
-                                <div className="text-xs text-white/25 mt-1">/ mes · si tu IA captura los servicios premium</div>
+                                <div className="text-xs text-white/25 mt-1">/ mes · si tu IA captura los servicios de ticket alto</div>
                             </div>
 
                             {/* Annual */}
@@ -318,10 +318,20 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                     </div>
                 </div>
 
-                {/* Bottom hint */}
-                <p className="mt-8 text-center text-xs text-white/20 font-light">
-                    La recomendación de pack se calcula en base a los minutos estimados de llamadas al mes
-                </p>
+                {/* Bottom explanation */}
+                <div className="mt-8 rounded-xl px-5 py-4 flex gap-3 items-start"
+                    style={{ background: 'rgba(0,204,102,0.04)', border: '1px solid rgba(0,204,102,0.1)' }}>
+                    <svg className="w-4 h-4 text-emerald-500/60 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <p className="text-xs text-white/40 leading-relaxed">
+                        {isPremiumFrequent
+                            ? <><span className="text-white/60 font-semibold">Proporción 50/50 activa:</span> Calculamos que el 50% de tus ventas son del ticket bajo y el otro 50% del ticket alto. Úsalo si tus servicios premium son igual de frecuentes que los básicos.</>
+                            : <><span className="text-white/60 font-semibold">Proporción 80/20 activa:</span> Calculamos que el 80% de tus ventas son del ticket medio bajo y solo el 20% del ticket alto. Es el reparto más habitual en servicios: los clientes contratan más lo básico y menos lo premium.</>
+                        }
+                        {' '}<span className="text-white/30">La recomendación de pack siempre usa el escenario realista.</span>
+                    </p>
+                </div>
             </Motion.div>
         </section>
     );
