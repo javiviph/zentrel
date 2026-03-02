@@ -64,7 +64,7 @@ function App() {
       {hasInteracted && calculatorData && (
         <>
           <Divider />
-          <RecommendationEngine maxLoss={calculatorData.maxLoss} onPackSelect={handlePackSelect} />
+          <RecommendationEngine estimatedMinutes={calculatorData.estimatedMinutes || 0} onPackSelect={handlePackSelect} />
           <Divider />
           <LeadForm calculatorData={calculatorData} recommendedPack={recommendedPack} />
         </>

@@ -1,54 +1,45 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 
-const PACKS = {
-    mini: {
-        name: 'Pack Mini',
-        price: '250',
-        tag: 'Ideal para empezar',
-        description: 'Recupera tu inversión con solo 2 citas salvadas al mes. Perfecto para autónomos y pequeños negocios.',
-        features: ['Recepcionista IA 24/7', 'Hasta 200 llamadas/mes', 'WhatsApp automatizado', 'Soporte por email'],
-        color: '#94a3b8',
-        glowColor: 'rgba(148,163,184,0.1)',
-        borderColor: 'rgba(148,163,184,0.15)',
-    },
-    standard: {
-        name: 'Pack Standard',
-        price: '450',
-        tag: 'Más popular',
-        description: 'La solución equilibrada para clínicas y negocios en crecimiento que no pueden permitirse perder ni una llamada más.',
-        features: ['Recepcionista IA 24/7', 'Llamadas ilimitadas', 'WhatsApp + CRM integrado', 'Soporte prioritario'],
-        color: '#00CC66',
-        glowColor: 'rgba(0,204,102,0.12)',
-        borderColor: 'rgba(0,204,102,0.25)',
-    },
-    medium: {
-        name: 'Pack Medium',
-        price: '750',
-        tag: 'Alta saturación',
-        description: 'Máxima eficiencia para negocios con alto volumen de llamadas que necesitan automatización completa.',
-        features: ['Todo lo del Standard', 'Multi-agente IA', 'Integraciones avanzadas', 'Account Manager dedicado'],
-        color: '#f97316',
-        glowColor: 'rgba(249,115,22,0.1)',
-        borderColor: 'rgba(249,115,22,0.2)',
-    },
-    enterprise: {
-        name: 'Pack Enterprise',
-        price: null,
-        tag: 'Grandes volúmenes',
-        description: 'Infraestructura multi-agente personalizada para empresas con necesidades críticas de alto volumen.',
-        features: ['Infraestructura dedicada', 'SLA garantizado', 'Integración a medida', 'Soporte 24/7 premium'],
-        color: '#a855f7',
-        glowColor: 'rgba(168,85,247,0.1)',
-        borderColor: 'rgba(168,85,247,0.2)',
-    },
-};
-
-const getPackKey = (maxLoss) => {
-    if (maxLoss < 1500) return 'mini';
-    if (maxLoss <= 4500) return 'standard';
-    if (maxLoss <= 8000) return 'medium';
-    return 'enterprise';
+// Pack logic based on estimatedMinutes per month
+const getRecommendation = (minutes) => {
+    if (minutes <= 100) {
+        return {
+            name: 'Pack Mini',
+            price: '250',
+            included: '100 min/mes',
+            tag: 'Ideal para empezar',
+            description: 'Perfecto si recibes pocas llamadas diarias. Recupera tu inversión con solo 2 citas salvadas al mes.',
+            features: ['Recepcionista IA 24/7', 'Hasta 100 min de llamadas/mes', 'Agendado en Google Calendar', 'Recordatorios WhatsApp'],
+            color: '#94a3b8',
+            glowColor: 'rgba(148,163,184,0.1)',
+            borderColor: 'rgba(148,163,184,0.15)',
+        };
+    } else if (minutes <= 250) {
+        return {
+            name: 'Pack Standard',
+            price: '450',
+            included: '250 min/mes',
+            tag: 'Más popular',
+            description: 'La solución equilibrada para clínicas y negocios en crecimiento que no pueden permitirse perder ni una llamada más.',
+            features: ['Recepcionista IA 24/7', 'Hasta 250 min de llamadas/mes', 'Google Calendar + WhatsApp', 'Soporte prioritario'],
+            color: '#00CC66',
+            glowColor: 'rgba(0,204,102,0.12)',
+            borderColor: 'rgba(0,204,102,0.25)',
+        };
+    } else {
+        return {
+            name: 'Pack Medium',
+            price: '750',
+            included: '600 min/mes',
+            tag: 'Alta saturación',
+            description: 'Máxima eficiencia para negocios con alto volumen de llamadas. Incluye 600 minutos mensuales de cobertura.',
+            features: ['Recepcionista IA 24/7', 'Hasta 600 min de llamadas/mes', 'Integraciones avanzadas', 'Account Manager dedicado'],
+            color: '#f97316',
+            glowColor: 'rgba(249,115,22,0.1)',
+            borderColor: 'rgba(249,115,22,0.2)',
+        };
+    }
 };
 
 const CheckIcon = ({ color }) => (
@@ -57,13 +48,12 @@ const CheckIcon = ({ color }) => (
     </svg>
 );
 
-const RecommendationEngine = ({ maxLoss, onPackSelect }) => {
-    const packKey = getPackKey(maxLoss);
-    const pack = PACKS[packKey];
+const RecommendationEngine = ({ estimatedMinutes = 0, onPackSelect }) => {
+    const pack = getRecommendation(estimatedMinutes);
 
     React.useEffect(() => {
         if (onPackSelect) onPackSelect(pack);
-    }, [packKey, pack, onPackSelect]);
+    }, [estimatedMinutes, pack, onPackSelect]);
 
     return (
         <section className="w-full max-w-5xl mx-auto px-4 py-8">
@@ -74,7 +64,7 @@ const RecommendationEngine = ({ maxLoss, onPackSelect }) => {
             </div>
 
             <Motion.div
-                key={packKey}
+                key={pack.name}
                 initial={{ opacity: 0, y: 16, scale: 0.98 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
@@ -84,26 +74,27 @@ const RecommendationEngine = ({ maxLoss, onPackSelect }) => {
                     border: `1px solid ${pack.borderColor}`,
                 }}
             >
-                {/* Glow in corner */}
+                {/* Glow corners */}
                 <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full pointer-events-none"
                     style={{ background: `radial-gradient(circle, ${pack.glowColor} 0%, transparent 70%)` }}></div>
                 <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full pointer-events-none"
                     style={{ background: `radial-gradient(circle, ${pack.glowColor} 0%, transparent 70%)` }}></div>
 
                 <div className="relative z-10 p-6 sm:p-8 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+
                     {/* Left: details */}
                     <div>
                         {/* Badge */}
                         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold mb-4"
-                            style={{ background: `${pack.glowColor}`, border: `1px solid ${pack.borderColor}`, color: pack.color }}>
+                            style={{ background: pack.glowColor, border: `1px solid ${pack.borderColor}`, color: pack.color }}>
                             <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: pack.color }}></span>
                             {pack.tag}
                         </div>
 
-                        <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-2" style={{ color: pack.color }}>
+                        <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-1" style={{ color: pack.color }}>
                             {pack.name}
                         </h2>
-
+                        <p className="text-xs text-white/30 mb-4 font-mono">Incluye {pack.included}</p>
                         <p className="text-white/50 text-sm leading-relaxed mb-6">{pack.description}</p>
 
                         <ul className="space-y-3">
@@ -119,28 +110,22 @@ const RecommendationEngine = ({ maxLoss, onPackSelect }) => {
                     {/* Right: pricing */}
                     <div className="flex flex-col items-center md:items-end text-center md:text-right gap-4">
                         <div>
-                            {pack.price ? (
-                                <>
-                                    <div className="text-6xl sm:text-7xl font-black font-mono tabular-nums" style={{ color: pack.color }}>
-                                        {pack.price}€
-                                    </div>
-                                    <div className="text-white/30 text-sm font-medium mt-1">/mes · sin permanencia</div>
-                                </>
-                            ) : (
-                                <div className="text-5xl font-black" style={{ color: pack.color }}>Consultar</div>
-                            )}
+                            <div className="text-6xl sm:text-7xl font-black font-mono tabular-nums" style={{ color: pack.color }}>
+                                {pack.price}€
+                            </div>
+                            <div className="text-white/30 text-sm font-medium mt-1">/mes · sin permanencia</div>
                         </div>
 
                         {/* Setup fee */}
                         <div className="rounded-xl p-4 w-full md:max-w-xs text-left"
                             style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                            <div className="text-xs text-white/30 mb-1 uppercase tracking-wider font-semibold">Setup inicial</div>
-                            <div className="text-white/70 text-sm font-medium">499€ · Pago único</div>
-                            <div className="text-white/30 text-xs mt-0.5">Configuración de infraestructura y entrenamiento de IA</div>
+                            <div className="text-xs text-white/30 mb-1 uppercase tracking-wider font-semibold">Inversión inicial</div>
+                            <div className="text-white/70 text-sm font-bold">499€ · Pago único</div>
+                            <div className="text-white/25 text-xs mt-0.5">Configuración e infraestructura privada</div>
                         </div>
 
                         <a href="#lead-form"
-                            className="w-full md:max-w-xs flex items-center justify-center gap-2 py-4 px-6 rounded-xl font-semibold text-sm uppercase tracking-wider transition-all duration-200 active:scale-95"
+                            className="w-full md:max-w-xs flex items-center justify-center gap-2 py-4 px-6 rounded-xl font-semibold text-sm uppercase tracking-wider transition-all duration-200 active:scale-95 hover:opacity-90"
                             style={{
                                 background: pack.color,
                                 color: '#000',

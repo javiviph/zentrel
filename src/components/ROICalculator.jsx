@@ -12,6 +12,14 @@ const AnimatedNumber = ({ value }) => {
     return <Motion.span>{display}</Motion.span>;
 };
 
+// Animated plain integer
+const AnimatedInt = ({ value, suffix = '' }) => {
+    const spring = useSpring(value, { mass: 0.6, stiffness: 80, damping: 14 });
+    const display = useTransform(spring, (c) => `${Math.round(c)}${suffix}`);
+    useEffect(() => { spring.set(value); }, [spring, value]);
+    return <Motion.span>{display}</Motion.span>;
+};
+
 // Slider with dynamic fill track
 const Slider = ({ id, label, value, min, max, step = 1, format, onChange }) => {
     const pct = ((value - min) / (max - min)) * 100;
@@ -21,19 +29,17 @@ const Slider = ({ id, label, value, min, max, step = 1, format, onChange }) => {
                 <label htmlFor={id} className="text-xs font-semibold uppercase tracking-widest text-white/40">{label}</label>
                 <span className="text-sm font-mono font-bold text-white/90 tabular-nums">{format ? format(value) : value}</span>
             </div>
-            <div className="relative">
-                <input
-                    id={id}
-                    type="range"
-                    min={min}
-                    max={max}
-                    step={step}
-                    value={value}
-                    onChange={(e) => onChange(Number(e.target.value))}
-                    style={{ '--range-fill': `${pct}%` }}
-                    className="w-full"
-                />
-            </div>
+            <input
+                id={id}
+                type="range"
+                min={min}
+                max={max}
+                step={step}
+                value={value}
+                onChange={(e) => onChange(Number(e.target.value))}
+                style={{ '--range-fill': `${pct}%` }}
+                className="w-full"
+            />
             <div className="flex justify-between text-xs text-white/20 font-mono">
                 <span>{format ? format(min) : min}</span>
                 <span>{format ? format(max) : max}</span>
@@ -42,7 +48,35 @@ const Slider = ({ id, label, value, min, max, step = 1, format, onChange }) => {
     );
 };
 
-// Toggle Switch component
+// Checkbox toggle
+const CheckOption = ({ id, label, checked, onChange }) => (
+    <label htmlFor={id} className="flex items-center gap-3 cursor-pointer group select-none">
+        <div className="relative shrink-0 w-5 h-5 rounded-md transition-colors duration-150"
+            style={{
+                background: checked ? '#00CC66' : 'rgba(255,255,255,0.06)',
+                border: checked ? '1px solid #00CC66' : '1px solid rgba(255,255,255,0.12)',
+            }}>
+            {checked && (
+                <svg className="absolute inset-0 w-full h-full p-0.5 text-black" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+            )}
+            <input id={id} type="checkbox" className="sr-only" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+        </div>
+        <span className="text-xs font-medium text-white/60 group-hover:text-white/80 transition-colors">{label}</span>
+        <span className="ml-auto text-xs text-emerald-500/70 font-mono">{checked ? '+4 días' : ''}</span>
+    </label>
+);
+
+// Stat pill in result card
+const StatPill = ({ label, value }) => (
+    <div className="flex flex-col items-center gap-0.5">
+        <span className="text-lg font-black font-mono text-white/70 tabular-nums">{value}</span>
+        <span className="text-xs text-white/25 uppercase tracking-widest">{label}</span>
+    </div>
+);
+
+// Toggle Switch
 const Toggle = ({ id, label, hint, checked, onChange }) => (
     <div className="flex items-center justify-between gap-4 rounded-xl px-4 py-3"
         style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
@@ -55,9 +89,8 @@ const Toggle = ({ id, label, hint, checked, onChange }) => (
             role="switch"
             aria-checked={checked}
             onClick={() => onChange(!checked)}
-            className="relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none"
-            style={{ background: checked ? '#00CC66' : 'rgba(255,255,255,0.1)' }}
-        >
+            className="relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200"
+            style={{ background: checked ? '#00CC66' : 'rgba(255,255,255,0.1)' }}>
             <span className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200"
                 style={{ transform: checked ? 'translateX(20px)' : 'translateX(0)' }} />
         </button>
@@ -65,58 +98,58 @@ const Toggle = ({ id, label, hint, checked, onChange }) => (
 );
 
 const ROICalculator = ({ onCalculate, onInteract }) => {
-    const [missedCalls, setMissedCalls] = useState(10);
+    const [missedCalls, setMissedCalls] = useState(5);
     const [minTicket, setMinTicket] = useState(80);
     const [maxTicket, setMaxTicket] = useState(200);
-    // Toggle: is the premium ticket frequent? No → 80/20, Yes → 50/50
+    const [attendSat, setAttendSat] = useState(false);
+    const [attendSun, setAttendSun] = useState(false);
     const [isPremiumFrequent, setIsPremiumFrequent] = useState(false);
 
     const [realisticLoss, setRealisticLoss] = useState(0);
     const [potentialLoss, setPotentialLoss] = useState(0);
     const [realisticAnnual, setRealisticAnnual] = useState(0);
     const [potentialAnnual, setPotentialAnnual] = useState(0);
+    const [callsPerMonth, setCallsPerMonth] = useState(0);
+    const [estimatedMinutes, setEstimatedMinutes] = useState(0);
+    const [workingDays, setWorkingDays] = useState(20);
 
     const interacted = useRef(false);
 
     useEffect(() => {
-        // Weighted ticket: 80/20 or 50/50 depending on toggle
-        const lowWeight = isPremiumFrequent ? 0.5 : 0.8;
-        const highWeight = isPremiumFrequent ? 0.5 : 0.2;
-        const realisticTicket = (minTicket * lowWeight) + (maxTicket * highWeight);
+        const days = 20 + (attendSat ? 4 : 0) + (attendSun ? 4 : 0);
+        const lowW = isPremiumFrequent ? 0.5 : 0.8;
+        const highW = isPremiumFrequent ? 0.5 : 0.2;
+        const wTicket = (minTicket * lowW) + (maxTicket * highW);
 
-        const calcRealistic = missedCalls * 20 * realisticTicket;
-        const calcPotential = missedCalls * 20 * maxTicket;
+        const calls = missedCalls * days;
+        const minutes = calls * 2;
+        const calcR = calls * wTicket;
+        const calcP = calls * maxTicket;
 
-        setRealisticLoss(calcRealistic);
-        setPotentialLoss(calcPotential);
-        setRealisticAnnual(calcRealistic * 12);
-        setPotentialAnnual(calcPotential * 12);
+        setWorkingDays(days);
+        setCallsPerMonth(calls);
+        setEstimatedMinutes(minutes);
+        setRealisticLoss(calcR);
+        setPotentialLoss(calcP);
+        setRealisticAnnual(calcR * 12);
+        setPotentialAnnual(calcP * 12);
 
         if (onCalculate) onCalculate({
             missedCalls, minTicket, maxTicket,
-            realisticLoss: calcRealistic,
-            potentialLoss: calcPotential,
-            // Expose for RecommendationEngine (uses realistic)
-            maxLoss: calcRealistic,
+            workingDays: days,
+            callsPerMonth: calls,
+            estimatedMinutes: minutes,
+            realisticLoss: calcR,
+            potentialLoss: calcP,
+            maxLoss: calcR, // used by RecommendationEngine for net saving calc
         });
-    }, [missedCalls, minTicket, maxTicket, isPremiumFrequent, onCalculate]);
+    }, [missedCalls, minTicket, maxTicket, attendSat, attendSun, isPremiumFrequent, onCalculate]);
 
-    const handleChange = (setter) => (val) => {
-        setter(val);
+    const markInteracted = () => {
         if (!interacted.current) {
             interacted.current = true;
             if (onInteract) onInteract();
         }
-    };
-
-    const handleMinTicket = (val) => {
-        handleChange(setMinTicket)(val);
-        if (val > maxTicket) setMaxTicket(val);
-    };
-
-    const handleMaxTicket = (val) => {
-        handleChange(setMaxTicket)(val);
-        if (val < minTicket) setMinTicket(val);
     };
 
     const ratio = isPremiumFrequent ? '50 / 50' : '80 / 20';
@@ -129,7 +162,7 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                 transition={{ duration: 0.6 }}
                 className="glass-card rounded-3xl p-6 sm:p-8 md:p-12 relative overflow-hidden"
             >
-                {/* Background glow blob */}
+                {/* Glow blob */}
                 <div className="absolute -top-32 -right-32 w-80 h-80 rounded-full pointer-events-none"
                     style={{ background: 'radial-gradient(circle, rgba(0,180,80,0.1) 0%, transparent 70%)' }}></div>
 
@@ -144,18 +177,19 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                     <span style={{ color: '#00CC66' }}>no coger el teléfono.</span>
                 </h2>
                 <p className="text-white/40 text-sm mb-10 max-w-xl">
-                    Ajusta los sliders con los datos de tu negocio y mira cómo se acumula la pérdida mes a mes.
+                    Ajusta los datos de tu negocio y mira cómo se acumula la pérdida mes a mes.
                 </p>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-                    {/* Sliders + Toggle */}
-                    <div className="space-y-8">
+
+                    {/* ── LEFT: inputs ── */}
+                    <div className="space-y-7">
                         <Slider
                             id="missed-calls"
                             label="Llamadas perdidas al día"
                             value={missedCalls}
-                            min={1} max={100}
-                            onChange={handleChange(setMissedCalls)}
+                            min={1} max={20}
+                            onChange={(v) => { setMissedCalls(v); markInteracted(); }}
                         />
                         <Slider
                             id="min-ticket"
@@ -163,7 +197,11 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                             value={minTicket}
                             min={20} max={500} step={5}
                             format={(v) => `${v}€`}
-                            onChange={handleMinTicket}
+                            onChange={(v) => {
+                                setMinTicket(v);
+                                if (v > maxTicket) setMaxTicket(v);
+                                markInteracted();
+                            }}
                         />
                         <Slider
                             id="max-ticket"
@@ -171,28 +209,46 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                             value={maxTicket}
                             min={20} max={500} step={5}
                             format={(v) => `${v}€`}
-                            onChange={handleMaxTicket}
+                            onChange={(v) => {
+                                setMaxTicket(v);
+                                if (v < minTicket) setMinTicket(v);
+                                markInteracted();
+                            }}
                         />
 
-                        {/* Toggle */}
+                        {/* Weekend checkboxes */}
+                        <div className="rounded-xl px-4 py-4 space-y-3"
+                            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                            <p className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-3">¿En qué días recibes llamadas?</p>
+                            <CheckOption
+                                id="attend-sat"
+                                label="Atendemos sábados"
+                                checked={attendSat}
+                                onChange={(v) => { setAttendSat(v); markInteracted(); }}
+                            />
+                            <CheckOption
+                                id="attend-sun"
+                                label="Atendemos domingos"
+                                checked={attendSun}
+                                onChange={(v) => { setAttendSun(v); markInteracted(); }}
+                            />
+                            <p className="text-xs text-white/20 pt-1">
+                                Días de cálculo: <span className="text-white/40 font-mono font-bold">{workingDays} días/mes</span>
+                            </p>
+                        </div>
+
+                        {/* Frequency toggle */}
                         <Toggle
                             id="premium-frequent"
                             label="¿Tu ticket alto es un servicio frecuente?"
                             hint={`Proporción aplicada: ${ratio} (bajo / alto)`}
                             checked={isPremiumFrequent}
-                            onChange={(val) => {
-                                setIsPremiumFrequent(val);
-                                if (!interacted.current) {
-                                    interacted.current = true;
-                                    if (onInteract) onInteract();
-                                }
-                            }}
+                            onChange={(v) => { setIsPremiumFrequent(v); markInteracted(); }}
                         />
                     </div>
 
-                    {/* Result card — two scenarios */}
+                    {/* ── RIGHT: result card ── */}
                     <div className="relative">
-                        {/* Red glow */}
                         <div className="absolute inset-0 rounded-2xl pointer-events-none"
                             style={{ background: 'radial-gradient(ellipse at center, rgba(220,30,30,0.1) 0%, transparent 70%)' }}></div>
 
@@ -202,7 +258,17 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                                 border: '1px solid rgba(255,50,50,0.15)'
                             }}>
 
-                            {/* ── Escenario Realista ── */}
+                            {/* Stats row */}
+                            <div className="flex justify-around mb-6 pb-5"
+                                style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                <StatPill label="Días / mes" value={<AnimatedInt value={workingDays} />} />
+                                <div className="w-px" style={{ background: 'rgba(255,255,255,0.06)' }}></div>
+                                <StatPill label="Llamadas / mes" value={<AnimatedInt value={callsPerMonth} />} />
+                                <div className="w-px" style={{ background: 'rgba(255,255,255,0.06)' }}></div>
+                                <StatPill label="Minutos estimados" value={<AnimatedInt value={estimatedMinutes} suffix=" min" />} />
+                            </div>
+
+                            {/* Escenario Realista */}
                             <div className="mb-5">
                                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold mb-3"
                                     style={{ background: 'rgba(255,68,68,0.1)', color: '#FF6666', border: '1px solid rgba(255,68,68,0.15)' }}>
@@ -218,7 +284,7 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                             {/* Separator */}
                             <div className="w-full h-px mb-5" style={{ background: 'rgba(255,255,255,0.05)' }}></div>
 
-                            {/* ── Escenario de Éxito ── */}
+                            {/* Escenario de Éxito */}
                             <div className="mb-5">
                                 <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold mb-3"
                                     style={{ background: 'rgba(255,170,0,0.1)', color: '#FFAA00', border: '1px solid rgba(255,170,0,0.15)' }}>
@@ -231,7 +297,7 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                                 <div className="text-xs text-white/25 mt-1">/ mes · si tu IA captura los servicios premium</div>
                             </div>
 
-                            {/* Annual row */}
+                            {/* Annual */}
                             <div className="mt-2 pt-4 w-full border-t border-white/5">
                                 <div className="text-xs text-white/20 uppercase tracking-widest mb-2">Pérdida anual acumulada</div>
                                 <div className="flex justify-center items-center gap-3 flex-wrap">
@@ -245,7 +311,7 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                                 </div>
                             </div>
 
-                            {/* Decorative bottom line */}
+                            {/* Bottom line */}
                             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/3 h-px"
                                 style={{ background: 'linear-gradient(to right, transparent, rgba(255,68,68,0.4), transparent)' }}></div>
                         </div>
@@ -254,7 +320,7 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
 
                 {/* Bottom hint */}
                 <p className="mt-8 text-center text-xs text-white/20 font-light">
-                    Basado en 20 días laborables al mes · La recomendación de pack usa siempre el escenario realista
+                    La recomendación de pack se calcula en base a los minutos estimados de llamadas al mes
                 </p>
             </Motion.div>
         </section>
