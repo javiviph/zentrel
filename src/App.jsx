@@ -65,8 +65,7 @@ function App() {
         <>
           <Divider />
           <RecommendationEngine
-            estimatedMinutes={calculatorData.estimatedMinutes || 0}
-            calculatorData={calculatorData}
+            callsPerMonth={calculatorData.callsPerMonth || 0}
             onPackSelect={handlePackSelect}
           />
           <Divider />
