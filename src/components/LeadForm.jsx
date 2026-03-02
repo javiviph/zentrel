@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
+import { motion as Motion } from 'framer-motion';
 
-const LeadForm = ({ calculatorData }) => {
-    const [formData, setFormData] = useState({ name: '', phone: '' });
+const LeadForm = ({ calculatorData, recommendedPack }) => {
+    const [formData, setFormData] = useState({ name: '', phone: '', email: '' });
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleChange = (e) => {
@@ -19,11 +20,13 @@ const LeadForm = ({ calculatorData }) => {
             const payload = {
                 name: formData.name,
                 phone: formData.phone,
-                monthlySaving: calculatorData?.monthlyLoss || 0,
-                annualSaving: calculatorData?.annualLoss || 0,
+                email: formData.email,
+                minLoss: calculatorData?.minLoss || 0,
+                maxLoss: calculatorData?.maxLoss || 0,
                 minTicket: calculatorData?.minTicket || 0,
                 maxTicket: calculatorData?.maxTicket || 0,
-                missedCalls: calculatorData?.missedCalls || 0
+                missedCalls: calculatorData?.missedCalls || 0,
+                recommendedPack: recommendedPack?.name || 'N/A'
             };
 
             if (webhookUrl) {
@@ -31,10 +34,12 @@ const LeadForm = ({ calculatorData }) => {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
-                }).catch(err => console.error("Webhook submission failed", err)); // Silently catch so redirect still happens
+                }).catch(err => console.error("Webhook submission failed", err));
             }
 
             if (checkoutUrl) {
+                // Here you could append pass-through variables for the agent like ?checkout[custom][agent_id]=...
+                // For now, redirecting to the main URL as specified
                 window.location.href = checkoutUrl;
             } else {
                 alert("Configura VITE_LEMON_SQUEEZY_URL en el archivo .env");
@@ -46,12 +51,21 @@ const LeadForm = ({ calculatorData }) => {
         }
     };
 
+    const buttonText = recommendedPack
+        ? `Activar mi ${recommendedPack.name} ahora`
+        : 'Activar mi Pack ahora';
+
     return (
-        <section className="w-full max-w-xl mx-auto px-4 py-8 mb-20 animate-fade-in-up" id="lead-form">
-            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
-                <h3 className="text-2xl font-bold mb-6 text-center text-white">Deja de perder dinero hoy</h3>
+        <section className="w-full max-w-xl mx-auto px-4 py-8 mb-20 relative z-10" id="lead-form">
+            <Motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="bg-black border border-zinc-800 rounded-3xl p-8 shadow-2xl"
+            >
+                <h3 className="text-2xl font-bold mb-6 text-center text-white">Únete a Zentrel hoy</h3>
                 <p className="text-zinc-400 text-center mb-8 text-sm">
-                    Déjanos tus datos, nuestro equipo se pondrá en contacto y comenzarás la configuración para recuperar tus ingresos.
+                    Déjanos tus datos, nuestro equipo se pondrá en contacto inmediatamente para configurar tu infraestructura y detener las pérdidas.
                 </p>
 
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -64,7 +78,20 @@ const LeadForm = ({ calculatorData }) => {
                             value={formData.name}
                             onChange={handleChange}
                             placeholder="Ej. Juan Pérez"
-                            className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
+                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-sm text-zinc-400 uppercase tracking-widest font-semibold mb-2">Email Profesional</label>
+                        <input
+                            type="email"
+                            name="email"
+                            required
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="juan@empresa.com"
+                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
                         />
                     </div>
 
@@ -77,27 +104,20 @@ const LeadForm = ({ calculatorData }) => {
                             value={formData.phone}
                             onChange={handleChange}
                             placeholder="+34 600 000 000"
-                            className="w-full bg-black border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
+                            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-green-500 focus:ring-1 focus:ring-green-500 transition-colors"
                         />
-                    </div>
-
-                    {/* Hidden fields just displayed as context info */}
-                    <div className="bg-black/50 p-4 rounded-xl border border-zinc-800/50 mb-6 flex justify-between items-center text-sm">
-                        <span className="text-zinc-500">Ahorro Mensual Proyectado:</span>
-                        <span className="text-green-400 font-mono font-bold">
-                            {new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(calculatorData?.monthlyLoss || 0)}
-                        </span>
                     </div>
 
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="w-full bg-white text-black font-bold text-lg py-4 rounded-xl hover:bg-zinc-200 transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider"
+                        className="w-full bg-white text-black font-bold text-sm md:text-base py-4 rounded-xl hover:bg-zinc-200 transition-colors active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed uppercase tracking-wider relative overflow-hidden group"
                     >
-                        {isSubmitting ? 'Procesando...' : 'Quiero dejar de perder dinero hoy'}
+                        <span className="relative z-10">{isSubmitting ? 'Procesando...' : buttonText}</span>
+                        <div className="absolute inset-0 bg-green-400 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 opacity-20"></div>
                     </button>
                 </form>
-            </div>
+            </Motion.div>
         </section>
     );
 };

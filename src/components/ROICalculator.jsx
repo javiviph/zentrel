@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion as Motion, useSpring, useTransform } from 'framer-motion';
 
 const FormatCurrency = (value) => {
     return new Intl.NumberFormat('es-ES', {
@@ -8,31 +9,41 @@ const FormatCurrency = (value) => {
     }).format(value);
 };
 
-const ROICalculator = ({ onCalculate, onInteract }) => {
-    const [missedCalls, setMissedCalls] = useState(5);
-    const [minTicket, setMinTicket] = useState(500);
-    const [maxTicket, setMaxTicket] = useState(1500);
-
-    const [monthlyLoss, setMonthlyLoss] = useState(0);
-    const [annualLoss, setAnnualLoss] = useState(0);
+// Fancy Animated Number Component
+const AnimatedNumber = ({ value }) => {
+    const spring = useSpring(value, { mass: 0.8, stiffness: 75, damping: 15 });
+    const display = useTransform(spring, (current) => FormatCurrency(Math.round(current)));
 
     useEffect(() => {
-        // Formula calculation
-        const avgTicket = (minTicket + maxTicket) / 2;
-        // Assuming 20 working days per month
-        const lossPerMonth = missedCalls * 20 * avgTicket;
-        const lossPerYear = lossPerMonth * 12;
+        spring.set(value);
+    }, [spring, value]);
 
-        setMonthlyLoss(lossPerMonth);
-        setAnnualLoss(lossPerYear);
+    return <Motion.span>{display}</Motion.span>;
+};
+
+const ROICalculator = ({ onCalculate, onInteract }) => {
+    const [missedCalls, setMissedCalls] = useState(10);
+    const [minTicket, setMinTicket] = useState(50);
+    const [maxTicket, setMaxTicket] = useState(150);
+
+    const [minLoss, setMinLoss] = useState(0);
+    const [maxLoss, setMaxLoss] = useState(0);
+
+    useEffect(() => {
+        // New Formula
+        const calculatedMinLoss = missedCalls * 20 * minTicket;
+        const calculatedMaxLoss = missedCalls * 20 * maxTicket;
+
+        setMinLoss(calculatedMinLoss);
+        setMaxLoss(calculatedMaxLoss);
 
         if (onCalculate) {
             onCalculate({
                 missedCalls,
                 minTicket,
                 maxTicket,
-                monthlyLoss,
-                annualLoss
+                minLoss: calculatedMinLoss,
+                maxLoss: calculatedMaxLoss
             });
         }
     }, [missedCalls, minTicket, maxTicket, onCalculate]);
@@ -51,12 +62,15 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
 
     return (
         <section className="w-full max-w-5xl mx-auto px-4 py-16 text-white" id="calculator">
-            <div className="bg-zinc-900/40 border border-zinc-800 rounded-3xl p-8 md:p-12 shadow-2xl backdrop-blur-sm">
+            <div className="bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+                {/* Subtle background gradient */}
+                <div className="absolute top-0 right-0 w-96 h-96 bg-zinc-800/20 blur-[100px] rounded-full pointer-events-none"></div>
+
                 <h3 className="text-3xl font-bold mb-8 text-center bg-clip-text text-transparent bg-gradient-to-r from-zinc-100 to-zinc-400">
                     Calculadora de Pérdidas
                 </h3>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center relative z-10">
                     {/* Controls */}
                     <div className="space-y-8">
                         <div className="space-y-4">
@@ -67,7 +81,7 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                             <input
                                 type="range"
                                 min="1"
-                                max="50"
+                                max="100"
                                 value={missedCalls}
                                 onChange={(e) => {
                                     setMissedCalls(Number(e.target.value));
@@ -77,20 +91,20 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                             />
                             <div className="flex justify-between text-xs text-zinc-600 font-mono">
                                 <span>1</span>
-                                <span>50+</span>
+                                <span>100</span>
                             </div>
                         </div>
 
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
-                                <label className="text-sm text-zinc-400 uppercase tracking-widest font-semibold">Ticket Medio Mínimo</label>
+                                <label className="text-sm text-zinc-400 uppercase tracking-widest font-semibold">Ticket Medio Bajo</label>
                                 <span className="text-2xl font-mono text-white">{FormatCurrency(minTicket)}</span>
                             </div>
                             <input
                                 type="range"
-                                min="50"
-                                max="5000"
-                                step="50"
+                                min="20"
+                                max="500"
+                                step="5"
                                 value={minTicket}
                                 onChange={(e) => {
                                     handleMinTicketChange(e.target.value);
@@ -98,18 +112,22 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                                 }}
                                 className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white"
                             />
+                            <div className="flex justify-between text-xs text-zinc-600 font-mono">
+                                <span>20€</span>
+                                <span>500€</span>
+                            </div>
                         </div>
 
                         <div className="space-y-4">
                             <div className="flex justify-between items-center">
-                                <label className="text-sm text-zinc-400 uppercase tracking-widest font-semibold">Ticket Medio Máximo</label>
+                                <label className="text-sm text-zinc-400 uppercase tracking-widest font-semibold">Ticket Medio Alto</label>
                                 <span className="text-2xl font-mono text-white">{FormatCurrency(maxTicket)}</span>
                             </div>
                             <input
                                 type="range"
-                                min="50"
-                                max="10000"
-                                step="50"
+                                min="20"
+                                max="500"
+                                step="5"
                                 value={maxTicket}
                                 onChange={(e) => {
                                     handleMaxTicketChange(e.target.value);
@@ -117,38 +135,30 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                                 }}
                                 className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-white"
                             />
+                            <div className="flex justify-between text-xs text-zinc-600 font-mono">
+                                <span>20€</span>
+                                <span>500€</span>
+                            </div>
                         </div>
                     </div>
 
                     {/* Results Screen */}
                     <div className="relative">
-                        {/* Background Glow based on loss */}
+                        {/* Red Alert Glow */}
                         <div className="absolute inset-0 bg-red-600/10 blur-[60px] rounded-full pointer-events-none transition-all duration-700"></div>
 
-                        <div className="relative bg-black/60 border border-zinc-800/50 rounded-2xl p-8 flex flex-col items-center justify-center text-center">
-                            <span className="text-zinc-500 uppercase tracking-widest text-xs font-bold mb-2">Mensualmente pierdes</span>
+                        <div className="relative bg-black/80 border border-zinc-800/80 rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-2xl">
+                            <span className="text-zinc-500 uppercase tracking-widest text-xs font-bold mb-4">Estás perdiendo entre</span>
 
-                            <div className="text-5xl md:text-7xl font-bold text-red-500 mb-6 font-mono tracking-tighter transition-all duration-300">
-                                {FormatCurrency(monthlyLoss)}
+                            <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-red-500 mb-2 font-mono tracking-tighter drop-shadow-lg flex flex-col md:flex-row items-center gap-2">
+                                <AnimatedNumber value={minLoss} />
+                                <span className="text-2xl md:text-4xl text-zinc-400 font-sans px-2">y</span>
+                                <AnimatedNumber value={maxLoss} />
                             </div>
 
-                            <div className="w-full h-px bg-zinc-800 my-4"></div>
-
-                            <span className="text-zinc-500 uppercase tracking-widest text-xs font-bold mb-2">Anualmente pierdes</span>
-                            <div className="text-4xl md:text-5xl font-bold text-orange-500 font-mono tracking-tighter transition-all duration-300">
-                                {FormatCurrency(annualLoss)}
-                            </div>
+                            <span className="text-zinc-500 uppercase tracking-widest text-xs font-bold mt-4">al mes</span>
                         </div>
                     </div>
-                </div>
-
-                {/* Zentrel Value Proposition */}
-                <div className="mt-12 bg-green-500/10 border border-green-500/30 rounded-xl p-6 text-center transform hover:scale-[1.02] transition-transform cursor-default">
-                    <p className="text-xl md:text-2xl font-medium text-green-400 flex flex-col md:flex-row items-center justify-center gap-2">
-                        <span>✨ Recupera todo esto por solo</span>
-                        <span className="font-bold text-white bg-green-500/20 px-3 py-1 rounded-lg">450€ / mes</span>
-                        <span>con nuestra IA.</span>
-                    </p>
                 </div>
             </div>
         </section>
