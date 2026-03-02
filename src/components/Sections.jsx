@@ -459,7 +459,7 @@ const FAQS = [
     },
     {
         q: '¿El agente suena como un robot?',
-        a: 'No. Usamos tecnología de síntesis de voz de última generación. La voz es natural y la conversación fluye de forma humana. La mayoría de clientes no notan la diferencia.',
+        a: 'No. Usamos tecnología de síntesis de voz de última generación. La voz es natural y la conversación fluye de forma humana.',
     },
     {
         q: '¿Necesito tener Google Calendar?',
