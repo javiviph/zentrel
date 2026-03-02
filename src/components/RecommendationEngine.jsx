@@ -141,27 +141,6 @@ const RecommendationEngine = ({ estimatedMinutes = 0, calculatorData, onPackSele
                             );
                         })()}
 
-                        {/* Dynamic ROI description */}
-                        {roi ? (
-                            <div className="rounded-xl p-4 mb-6 text-sm leading-relaxed"
-                                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
-                                <p className="text-white/60 mb-2">
-                                    Con un ticket ponderado de{' '}
-                                    <span className="font-bold text-white/80">{roi.fmtTicket}</span>
-                                    , <span className="font-bold" style={{ color: pack.color }}>solo necesitas {roi.citasNecesarias} {roi.citasNecesarias === 1 ? 'cita' : 'citas'} agendadas al mes</span> para cubrir el coste del plan.
-                                </p>
-                                {roi.netMonthly > 0 && (
-                                    <p className="text-white/40 text-xs">
-                                        Ganancia neta mensual estimada:{' '}
-                                        <span className="font-bold" style={{ color: pack.color }}>{roi.fmtNet}</span>
-                                    </p>
-                                )}
-                            </div>
-                        ) : (
-                            <p className="text-white/50 text-sm leading-relaxed mb-6">
-                                Ajusta la calculadora para ver tu ROI estimado.
-                            </p>
-                        )}
 
                         <ul className="space-y-3">
                             {pack.features.map((f) => (
