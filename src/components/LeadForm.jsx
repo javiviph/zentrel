@@ -89,35 +89,43 @@ const LeadForm = ({ calculatorData, recommendedPack }) => {
                     </div>
 
                     {/* Stat */}
-                    {calculatorData?.maxLoss > 0 && (() => {
+                    {calculatorData?.realisticLoss > 0 && (() => {
                         const fmt = (v) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
                         const packPrice = recommendedPack?.price ? Number(recommendedPack.price) : 0;
-                        const netSaving = Math.max(0, calculatorData.maxLoss - packPrice);
+                        const netSaving = Math.max(0, calculatorData.realisticLoss - packPrice);
                         return (
-                            <div className="relative z-10 mt-8 rounded-xl p-4"
+                            <div className="relative z-10 mt-8 rounded-xl p-4 space-y-3"
                                 style={{ background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(0,204,102,0.2)' }}>
-                                <div className="text-xs text-white/30 uppercase tracking-widest mb-3">Tu ahorro mensual neto</div>
 
-                                {/* Gross recovery */}
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-xs text-white/30">Ingresos recuperados</span>
-                                    <span className="text-sm font-mono font-semibold text-white/50">{fmt(calculatorData.maxLoss)}</span>
+                                {/* Realistic scenario */}
+                                <div>
+                                    <div className="text-xs text-white/25 uppercase tracking-widest mb-1">Escenario realista</div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs text-white/40">Ingresos recuperados</span>
+                                        <span className="text-sm font-mono font-semibold text-white/50">{fmt(calculatorData.realisticLoss)}</span>
+                                    </div>
+                                    {packPrice > 0 && (
+                                        <div className="flex justify-between items-center mt-1">
+                                            <span className="text-xs text-white/30">Coste Zentrel / mes</span>
+                                            <span className="text-sm font-mono text-red-400/50">− {fmt(packPrice)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between items-center mt-2 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                                        <span className="text-xs font-bold uppercase tracking-wider" style={{ color: packColor }}>Ganancia neta</span>
+                                        <span className="text-xl font-black font-mono" style={{ color: packColor }}>{fmt(netSaving)}</span>
+                                    </div>
                                 </div>
 
-                                {/* Deduction */}
-                                {packPrice > 0 && (
-                                    <div className="flex justify-between items-center pb-3 mb-3"
-                                        style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                                        <span className="text-xs text-white/30">Coste mensual Zentrel</span>
-                                        <span className="text-sm font-mono text-red-400/60">− {fmt(packPrice)}</span>
+                                {/* Potential scenario */}
+                                {calculatorData.potentialLoss > calculatorData.realisticLoss && (
+                                    <div className="pt-3" style={{ borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+                                        <div className="flex justify-between items-center">
+                                            <span className="text-xs text-white/25">Escenario de éxito</span>
+                                            <span className="text-sm font-mono font-semibold text-amber-400/50">{fmt(calculatorData.potentialLoss)}</span>
+                                        </div>
+                                        <p className="text-xs text-white/20 mt-1">Si tu IA captura los servicios premium</p>
                                     </div>
                                 )}
-
-                                {/* Net saving */}
-                                <div className="flex justify-between items-center">
-                                    <span className="text-xs font-bold uppercase tracking-wider" style={{ color: packColor }}>Ganancia neta</span>
-                                    <span className="text-xl font-black font-mono" style={{ color: packColor }}>{fmt(netSaving)}</span>
-                                </div>
                             </div>
                         );
                     })()}

@@ -42,25 +42,64 @@ const Slider = ({ id, label, value, min, max, step = 1, format, onChange }) => {
     );
 };
 
+// Toggle Switch component
+const Toggle = ({ id, label, hint, checked, onChange }) => (
+    <div className="flex items-center justify-between gap-4 rounded-xl px-4 py-3"
+        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+        <div>
+            <label htmlFor={id} className="text-xs font-semibold text-white/60 cursor-pointer">{label}</label>
+            {hint && <p className="text-xs text-white/25 mt-0.5">{hint}</p>}
+        </div>
+        <button
+            id={id}
+            role="switch"
+            aria-checked={checked}
+            onClick={() => onChange(!checked)}
+            className="relative shrink-0 w-11 h-6 rounded-full transition-colors duration-200 focus:outline-none"
+            style={{ background: checked ? '#00CC66' : 'rgba(255,255,255,0.1)' }}
+        >
+            <span className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform duration-200"
+                style={{ transform: checked ? 'translateX(20px)' : 'translateX(0)' }} />
+        </button>
+    </div>
+);
+
 const ROICalculator = ({ onCalculate, onInteract }) => {
     const [missedCalls, setMissedCalls] = useState(10);
     const [minTicket, setMinTicket] = useState(80);
     const [maxTicket, setMaxTicket] = useState(200);
-    const [minLoss, setMinLoss] = useState(0);
-    const [maxLoss, setMaxLoss] = useState(0);
-    const [minLossAnnual, setMinLossAnnual] = useState(0);
-    const [maxLossAnnual, setMaxLossAnnual] = useState(0);
+    // Toggle: is the premium ticket frequent? No → 80/20, Yes → 50/50
+    const [isPremiumFrequent, setIsPremiumFrequent] = useState(false);
+
+    const [realisticLoss, setRealisticLoss] = useState(0);
+    const [potentialLoss, setPotentialLoss] = useState(0);
+    const [realisticAnnual, setRealisticAnnual] = useState(0);
+    const [potentialAnnual, setPotentialAnnual] = useState(0);
+
     const interacted = useRef(false);
 
     useEffect(() => {
-        const calcMin = missedCalls * 20 * minTicket;
-        const calcMax = missedCalls * 20 * maxTicket;
-        setMinLoss(calcMin);
-        setMaxLoss(calcMax);
-        setMinLossAnnual(calcMin * 12);
-        setMaxLossAnnual(calcMax * 12);
-        if (onCalculate) onCalculate({ missedCalls, minTicket, maxTicket, minLoss: calcMin, maxLoss: calcMax });
-    }, [missedCalls, minTicket, maxTicket, onCalculate]);
+        // Weighted ticket: 80/20 or 50/50 depending on toggle
+        const lowWeight = isPremiumFrequent ? 0.5 : 0.8;
+        const highWeight = isPremiumFrequent ? 0.5 : 0.2;
+        const realisticTicket = (minTicket * lowWeight) + (maxTicket * highWeight);
+
+        const calcRealistic = missedCalls * 20 * realisticTicket;
+        const calcPotential = missedCalls * 20 * maxTicket;
+
+        setRealisticLoss(calcRealistic);
+        setPotentialLoss(calcPotential);
+        setRealisticAnnual(calcRealistic * 12);
+        setPotentialAnnual(calcPotential * 12);
+
+        if (onCalculate) onCalculate({
+            missedCalls, minTicket, maxTicket,
+            realisticLoss: calcRealistic,
+            potentialLoss: calcPotential,
+            // Expose for RecommendationEngine (uses realistic)
+            maxLoss: calcRealistic,
+        });
+    }, [missedCalls, minTicket, maxTicket, isPremiumFrequent, onCalculate]);
 
     const handleChange = (setter) => (val) => {
         setter(val);
@@ -79,6 +118,8 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
         handleChange(setMaxTicket)(val);
         if (val < minTicket) setMinTicket(val);
     };
+
+    const ratio = isPremiumFrequent ? '50 / 50' : '80 / 20';
 
     return (
         <section className="relative w-full max-w-5xl mx-auto px-4 py-8" id="calculator">
@@ -99,7 +140,7 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
-                    {/* Sliders */}
+                    {/* Sliders + Toggle */}
                     <div className="space-y-8">
                         <Slider
                             id="missed-calls"
@@ -124,45 +165,76 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                             format={(v) => `${v}€`}
                             onChange={handleMaxTicket}
                         />
+
+                        {/* Toggle */}
+                        <Toggle
+                            id="premium-frequent"
+                            label="¿Tu ticket alto es un servicio frecuente?"
+                            hint={`Proporción aplicada: ${ratio} (bajo / alto)`}
+                            checked={isPremiumFrequent}
+                            onChange={(val) => {
+                                setIsPremiumFrequent(val);
+                                if (!interacted.current) {
+                                    interacted.current = true;
+                                    if (onInteract) onInteract();
+                                }
+                            }}
+                        />
                     </div>
 
-                    {/* Result card */}
+                    {/* Result card — two scenarios */}
                     <div className="relative">
                         {/* Red glow */}
                         <div className="absolute inset-0 rounded-2xl pointer-events-none"
-                            style={{ background: 'radial-gradient(ellipse at center, rgba(220,30,30,0.12) 0%, transparent 70%)' }}></div>
+                            style={{ background: 'radial-gradient(ellipse at center, rgba(220,30,30,0.1) 0%, transparent 70%)' }}></div>
 
-                        <div className="relative rounded-2xl p-6 sm:p-8 flex flex-col items-center justify-center text-center min-h-[220px]"
+                        <div className="relative rounded-2xl p-6 sm:p-8 flex flex-col w-full text-center"
                             style={{
                                 background: 'linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
                                 border: '1px solid rgba(255,50,50,0.15)'
                             }}>
-                            <span className="text-xs font-semibold uppercase tracking-widest text-white/30 mb-5">Estás perdiendo entre</span>
 
-                            <div className="flex flex-wrap justify-center items-center gap-x-2 gap-y-1 w-full mb-5">
-                                <span className="text-3xl sm:text-4xl md:text-5xl font-black font-mono tabular-nums"
-                                    style={{ color: '#FF4444' }}>
-                                    <AnimatedNumber value={minLoss} />
-                                </span>
-                                <span className="text-lg sm:text-xl text-white/30 font-light px-1">y</span>
-                                <span className="text-3xl sm:text-4xl md:text-5xl font-black font-mono tabular-nums"
-                                    style={{ color: '#FF8800' }}>
-                                    <AnimatedNumber value={maxLoss} />
-                                </span>
+                            {/* ── Escenario Realista ── */}
+                            <div className="mb-5">
+                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold mb-3"
+                                    style={{ background: 'rgba(255,68,68,0.1)', color: '#FF6666', border: '1px solid rgba(255,68,68,0.15)' }}>
+                                    <span className="w-1.5 h-1.5 rounded-full bg-red-400"></span>
+                                    Escenario Realista ({ratio})
+                                </div>
+                                <div className="text-3xl sm:text-4xl font-black font-mono tabular-nums" style={{ color: '#FF4444' }}>
+                                    <AnimatedNumber value={realisticLoss} />
+                                </div>
+                                <div className="text-xs text-white/25 mt-1">/ mes · lo que recuperarás seguro</div>
                             </div>
 
-                            <span className="text-xs font-semibold uppercase tracking-widest text-white/30">al mes</span>
+                            {/* Separator */}
+                            <div className="w-full h-px mb-5" style={{ background: 'rgba(255,255,255,0.05)' }}></div>
 
-                            {/* Annual loss */}
-                            <div className="mt-4 pt-4 w-full border-t border-white/5 flex items-center justify-center gap-2">
-                                <span className="text-xs text-white/20 uppercase tracking-widest">Al año:</span>
-                                <span className="text-sm font-mono font-bold text-white/30">
-                                    <AnimatedNumber value={minLossAnnual} />
-                                </span>
-                                <span className="text-xs text-white/20">—</span>
-                                <span className="text-sm font-mono font-bold text-white/30">
-                                    <AnimatedNumber value={maxLossAnnual} />
-                                </span>
+                            {/* ── Escenario de Éxito ── */}
+                            <div className="mb-5">
+                                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold mb-3"
+                                    style={{ background: 'rgba(255,170,0,0.1)', color: '#FFAA00', border: '1px solid rgba(255,170,0,0.15)' }}>
+                                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                                    Escenario de Éxito (ticket alto)
+                                </div>
+                                <div className="text-3xl sm:text-4xl font-black font-mono tabular-nums" style={{ color: '#FF8800' }}>
+                                    <AnimatedNumber value={potentialLoss} />
+                                </div>
+                                <div className="text-xs text-white/25 mt-1">/ mes · si tu IA captura los servicios premium</div>
+                            </div>
+
+                            {/* Annual row */}
+                            <div className="mt-2 pt-4 w-full border-t border-white/5">
+                                <div className="text-xs text-white/20 uppercase tracking-widest mb-2">Pérdida anual acumulada</div>
+                                <div className="flex justify-center items-center gap-3 flex-wrap">
+                                    <span className="text-sm font-mono font-bold text-red-400/50">
+                                        <AnimatedNumber value={realisticAnnual} />
+                                    </span>
+                                    <span className="text-white/15 text-xs">—</span>
+                                    <span className="text-sm font-mono font-bold text-amber-400/50">
+                                        <AnimatedNumber value={potentialAnnual} />
+                                    </span>
+                                </div>
                             </div>
 
                             {/* Decorative bottom line */}
@@ -174,7 +246,7 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
 
                 {/* Bottom hint */}
                 <p className="mt-8 text-center text-xs text-white/20 font-light">
-                    Basado en 20 días laborables al mes · Ajusta los sliders para ver tu estimación personalizada
+                    Basado en 20 días laborables al mes · La recomendación de pack usa siempre el escenario realista
                 </p>
             </Motion.div>
         </section>
