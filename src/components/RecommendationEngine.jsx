@@ -1,15 +1,14 @@
 import React from 'react';
 import { motion as Motion } from 'framer-motion';
 
-// Pack logic based on estimatedMinutes per month
-const getRecommendation = (minutes) => {
+// Pack definitions — descriptions are generated dynamically
+const getPack = (minutes) => {
     if (minutes <= 100) {
         return {
             name: 'Pack Mini',
             price: '250',
             included: '100 min/mes',
             tag: 'Ideal para empezar',
-            description: 'Perfecto si recibes pocas llamadas diarias. Recupera tu inversión con solo 2 citas salvadas al mes.',
             features: ['Recepcionista IA 24/7', 'Hasta 100 min de llamadas/mes', 'Agendado en Google Calendar', 'Recordatorios WhatsApp'],
             color: '#94a3b8',
             glowColor: 'rgba(148,163,184,0.1)',
@@ -21,7 +20,6 @@ const getRecommendation = (minutes) => {
             price: '450',
             included: '250 min/mes',
             tag: 'Más popular',
-            description: 'La solución equilibrada para clínicas y negocios en crecimiento que no pueden permitirse perder ni una llamada más.',
             features: ['Recepcionista IA 24/7', 'Hasta 250 min de llamadas/mes', 'Google Calendar + WhatsApp', 'Soporte prioritario'],
             color: '#00CC66',
             glowColor: 'rgba(0,204,102,0.12)',
@@ -33,7 +31,6 @@ const getRecommendation = (minutes) => {
             price: '750',
             included: '600 min/mes',
             tag: 'Alta saturación',
-            description: 'Máxima eficiencia para negocios con alto volumen de llamadas. Incluye 600 minutos mensuales de cobertura.',
             features: ['Recepcionista IA 24/7', 'Hasta 600 min de llamadas/mes', 'Integraciones avanzadas', 'Account Manager dedicado'],
             color: '#f97316',
             glowColor: 'rgba(249,115,22,0.1)',
@@ -42,14 +39,35 @@ const getRecommendation = (minutes) => {
     }
 };
 
+// Compute how many appointments are needed to break even
+const getBreakevenDescription = (packPrice, calculatorData) => {
+    const { realisticLoss = 0, callsPerMonth = 0 } = calculatorData || {};
+    if (!callsPerMonth || callsPerMonth === 0 || realisticLoss === 0) return null;
+
+    const weightedTicket = realisticLoss / callsPerMonth;        // € per appointment
+    const citasNecesarias = Math.ceil(packPrice / weightedTicket); // to cover monthly cost
+    const netMonthly = realisticLoss - packPrice;                 // realistic net saving
+
+    const fmt = (v) => new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(v);
+
+    return {
+        citasNecesarias,
+        weightedTicket: Math.round(weightedTicket),
+        netMonthly,
+        fmtNet: fmt(netMonthly),
+        fmtTicket: fmt(weightedTicket),
+    };
+};
+
 const CheckIcon = ({ color }) => (
     <svg className="w-4 h-4 shrink-0" style={{ color }} viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
     </svg>
 );
 
-const RecommendationEngine = ({ estimatedMinutes = 0, onPackSelect }) => {
-    const pack = getRecommendation(estimatedMinutes);
+const RecommendationEngine = ({ estimatedMinutes = 0, calculatorData, onPackSelect }) => {
+    const pack = getPack(estimatedMinutes);
+    const roi = getBreakevenDescription(Number(pack.price), calculatorData);
 
     React.useEffect(() => {
         if (onPackSelect) onPackSelect(pack);
@@ -95,7 +113,28 @@ const RecommendationEngine = ({ estimatedMinutes = 0, onPackSelect }) => {
                             {pack.name}
                         </h2>
                         <p className="text-xs text-white/30 mb-4 font-mono">Incluye {pack.included}</p>
-                        <p className="text-white/50 text-sm leading-relaxed mb-6">{pack.description}</p>
+
+                        {/* Dynamic ROI description */}
+                        {roi ? (
+                            <div className="rounded-xl p-4 mb-6 text-sm leading-relaxed"
+                                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.07)' }}>
+                                <p className="text-white/60 mb-2">
+                                    Con un ticket ponderado de{' '}
+                                    <span className="font-bold text-white/80">{roi.fmtTicket}</span>
+                                    , <span className="font-bold" style={{ color: pack.color }}>solo necesitas {roi.citasNecesarias} {roi.citasNecesarias === 1 ? 'cita' : 'citas'} agendadas al mes</span> para cubrir el coste del plan.
+                                </p>
+                                {roi.netMonthly > 0 && (
+                                    <p className="text-white/40 text-xs">
+                                        Ganancia neta mensual estimada:{' '}
+                                        <span className="font-bold" style={{ color: pack.color }}>{roi.fmtNet}</span>
+                                    </p>
+                                )}
+                            </div>
+                        ) : (
+                            <p className="text-white/50 text-sm leading-relaxed mb-6">
+                                Ajusta la calculadora para ver tu ROI estimado.
+                            </p>
+                        )}
 
                         <ul className="space-y-3">
                             {pack.features.map((f) => (

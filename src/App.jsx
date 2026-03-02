@@ -64,7 +64,11 @@ function App() {
       {hasInteracted && calculatorData && (
         <>
           <Divider />
-          <RecommendationEngine estimatedMinutes={calculatorData.estimatedMinutes || 0} onPackSelect={handlePackSelect} />
+          <RecommendationEngine
+            estimatedMinutes={calculatorData.estimatedMinutes || 0}
+            calculatorData={calculatorData}
+            onPackSelect={handlePackSelect}
+          />
           <Divider />
           <LeadForm calculatorData={calculatorData} recommendedPack={recommendedPack} />
         </>
