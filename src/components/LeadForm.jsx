@@ -123,7 +123,7 @@ const LeadForm = ({ calculatorData, recommendedPack }) => {
                                             <span className="text-xs text-white/25">Escenario de éxito</span>
                                             <span className="text-sm font-mono font-semibold text-amber-400/50">{fmt(calculatorData.potentialLoss)}</span>
                                         </div>
-                                        <p className="text-xs text-white/20 mt-1">Si tu IA captura los servicios premium</p>
+                                        <p className="text-xs text-white/20 mt-1">Si tu IA captura los servicios de ticket medio alto</p>
                                     </div>
                                 )}
                             </div>
