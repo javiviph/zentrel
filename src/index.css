@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-zentrel-green: #00FF00;
+  --color-zentrel-red: #FF0000;
+  --color-zentrel-orange: #FFA500;
+}
+
+body {
+  background-color: #000000;
+  color: #FFFFFF;
+  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
