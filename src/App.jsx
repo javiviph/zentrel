@@ -38,12 +38,12 @@ function App() {
       <Hero />
       <Divider />
 
-      {/* ── HOW IT WORKS ─────────────────────────── */}
-      <HowItWorks />
-      <Divider />
-
       {/* ── VIDEO DEMO ───────────────────────────── */}
       <VideoDemo />
+      <Divider />
+
+      {/* ── HOW IT WORKS ─────────────────────────── */}
+      <HowItWorks />
       <Divider />
 
       {/* ── PAIN POINTS ──────────────────────────── */}
