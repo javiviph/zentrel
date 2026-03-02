@@ -3,6 +3,21 @@ import Hero from './components/Hero';
 import ROICalculator from './components/ROICalculator';
 import RecommendationEngine from './components/RecommendationEngine';
 import LeadForm from './components/LeadForm';
+import {
+  HowItWorks,
+  PainPoints,
+  Features,
+  Comparison,
+  UseCases,
+  FAQ,
+  CTABanner,
+} from './components/Sections';
+
+const Divider = () => (
+  <div className="max-w-5xl mx-auto px-4">
+    <div className="h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent)' }}></div>
+  </div>
+);
 
 function App() {
   const [calculatorData, setCalculatorData] = useState(null);
@@ -14,42 +29,65 @@ function App() {
   const handlePackSelect = useCallback((pack) => setRecommendedPack(pack), []);
 
   return (
-    <main className="min-h-screen text-white overflow-x-hidden selection:bg-emerald-500/30 selection:text-white"
-      style={{ background: '#030A06' }}>
+    <main
+      className="min-h-screen text-white overflow-x-hidden selection:bg-emerald-500/30 selection:text-white"
+      style={{ background: '#030A06' }}
+    >
+      {/* ── HERO ─────────────────────────────────── */}
       <Hero />
+      <Divider />
 
-      {/* Divider */}
-      <div className="max-w-5xl mx-auto px-4">
-        <div className="h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent)' }}></div>
-      </div>
+      {/* ── HOW IT WORKS ─────────────────────────── */}
+      <HowItWorks />
+      <Divider />
 
+      {/* ── PAIN POINTS ──────────────────────────── */}
+      <PainPoints />
+      <Divider />
+
+      {/* ── FEATURES ─────────────────────────────── */}
+      <Features />
+      <Divider />
+
+      {/* ── COMPARISON TABLE ─────────────────────── */}
+      <Comparison />
+      <Divider />
+
+      {/* ── ROI CALCULATOR ───────────────────────── */}
       <ROICalculator onCalculate={handleCalculate} onInteract={handleInteract} />
 
       {hasInteracted && calculatorData && (
         <>
-          {/* Divider */}
-          <div className="max-w-5xl mx-auto px-4">
-            <div className="h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent)' }}></div>
-          </div>
-
+          <Divider />
           <RecommendationEngine maxLoss={calculatorData.maxLoss} onPackSelect={handlePackSelect} />
-
-          {/* Divider */}
-          <div className="max-w-5xl mx-auto px-4">
-            <div className="h-px" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.06), transparent)' }}></div>
-          </div>
-
+          <Divider />
           <LeadForm calculatorData={calculatorData} recommendedPack={recommendedPack} />
         </>
       )}
 
-      {/* Footer */}
-      <footer className="text-center pb-12 text-white/20 text-xs">
+      <Divider />
+
+      {/* ── USE CASES ────────────────────────────── */}
+      <UseCases />
+      <Divider />
+
+      {/* ── CTA BANNER ───────────────────────────── */}
+      <CTABanner />
+      <Divider />
+
+      {/* ── FAQ ──────────────────────────────────── */}
+      <FAQ />
+      <Divider />
+
+      {/* ── FOOTER ───────────────────────────────── */}
+      <footer className="text-center py-12 text-white/20 text-xs">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="h-px mb-8" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.05), transparent)' }}></div>
           <span className="font-semibold tracking-widest uppercase text-white/30">ZENTREL</span>
           <span className="mx-3 text-white/10">·</span>
-          <span>Agencia de Automatización de IA · {new Date().getFullYear()}</span>
+          <span>Automatización de Citas con IA · {new Date().getFullYear()}</span>
+          <div className="mt-3 text-white/10">
+            Agendado automático con Google Calendar + Recordatorios por WhatsApp
+          </div>
         </div>
       </footer>
     </main>
