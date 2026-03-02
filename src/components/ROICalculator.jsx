@@ -48,6 +48,8 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
     const [maxTicket, setMaxTicket] = useState(200);
     const [minLoss, setMinLoss] = useState(0);
     const [maxLoss, setMaxLoss] = useState(0);
+    const [minLossAnnual, setMinLossAnnual] = useState(0);
+    const [maxLossAnnual, setMaxLossAnnual] = useState(0);
     const interacted = useRef(false);
 
     useEffect(() => {
@@ -55,6 +57,8 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
         const calcMax = missedCalls * 20 * maxTicket;
         setMinLoss(calcMin);
         setMaxLoss(calcMax);
+        setMinLossAnnual(calcMin * 12);
+        setMaxLossAnnual(calcMax * 12);
         if (onCalculate) onCalculate({ missedCalls, minTicket, maxTicket, minLoss: calcMin, maxLoss: calcMax });
     }, [missedCalls, minTicket, maxTicket, onCalculate]);
 
@@ -148,6 +152,18 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                             </div>
 
                             <span className="text-xs font-semibold uppercase tracking-widest text-white/30">al mes</span>
+
+                            {/* Annual loss */}
+                            <div className="mt-4 pt-4 w-full border-t border-white/5 flex items-center justify-center gap-2">
+                                <span className="text-xs text-white/20 uppercase tracking-widest">Al año:</span>
+                                <span className="text-sm font-mono font-bold text-white/30">
+                                    <AnimatedNumber value={minLossAnnual} />
+                                </span>
+                                <span className="text-xs text-white/20">—</span>
+                                <span className="text-sm font-mono font-bold text-white/30">
+                                    <AnimatedNumber value={maxLossAnnual} />
+                                </span>
+                            </div>
 
                             {/* Decorative bottom line */}
                             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/3 h-px"

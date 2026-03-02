@@ -104,22 +104,75 @@ export const HowItWorks = () => (
     </section>
 );
 
+// ─── 1.5. VIDEO DEMO ───────────────────────────────────────────────────────────
+export const VideoDemo = () => (
+    <section className="w-full max-w-5xl mx-auto px-4 py-16">
+        <FadeIn>
+            <SectionLabel>Demo en vivo</SectionLabel>
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-3 leading-tight">
+                Escucha cómo suena{' '}
+                <span style={{ color: '#00CC66' }}>tu nuevo recepcionista.</span>
+            </h2>
+            <p className="text-white/40 text-sm mb-8 max-w-xl">
+                Una llamada real, gestionada por IA. Voz natural, fluida y capaz de agendar la cita en segundos.
+            </p>
+        </FadeIn>
+        <FadeIn delay={0.15}>
+            <div className="relative w-full rounded-2xl overflow-hidden"
+                style={{
+                    border: '1px solid rgba(0,204,102,0.15)',
+                    background: 'rgba(0,0,0,0.4)',
+                    aspectRatio: '16/9',
+                }}>
+                {/* Subtle green top glow */}
+                <div className="absolute top-0 inset-x-0 h-1 rounded-t-2xl pointer-events-none"
+                    style={{ background: 'linear-gradient(to right, transparent, rgba(0,204,102,0.5), transparent)' }}></div>
+                <iframe
+                    className="w-full h-full"
+                    src="https://www.youtube.com/embed/btcRN6OQwgM?si=zSaC6oAfo-DazVN6"
+                    title="Zentrel — Demo: Agente de Voz IA"
+                    frameBorder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                />
+            </div>
+        </FadeIn>
+    </section>
+);
+
 // ─── 2. PAIN POINTS ────────────────────────────────────────────────────────────
+const PainIcon1 = () => (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+    </svg>
+);
+const PainIcon2 = () => (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m8.66-10h-1M4.34 12h-1m15.07-6.07l-.71.71M6.34 17.66l-.71.71m12.02 0l-.71-.71M6.34 6.34l-.71-.71M12 7a5 5 0 100 10A5 5 0 0012 7z" />
+    </svg>
+);
+const PainIcon3 = () => (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2" />
+    </svg>
+);
+
 const PAINS = [
     {
-        emoji: '📵',
+        Icon: PainIcon1,
         stat: '73%',
         title: 'No vuelven a llamar',
         description: 'El 73% de los clientes no vuelven a intentarlo si no les atienden a la primera. Cada tono que suena en el vacío es dinero que se va.',
     },
     {
-        emoji: '🌙',
+        Icon: PainIcon2,
         stat: '22:00h',
         title: 'Clientes fuera de horario',
         description: 'Tus clientes llaman por la noche, en fines de semana o mientras atiendes a otro. Tu competencia sí contesta. Zentrel también lo hace.',
     },
     {
-        emoji: '🏳️',
+        Icon: PainIcon3,
         stat: '40%',
         title: 'No-shows sin avisar',
         description: 'Sin confirmación previa, hasta el 40% de las citas no se presentan. Un simple recordatorio de WhatsApp lo soluciona por completo.',
@@ -133,7 +186,7 @@ export const PainPoints = () => (
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-3 leading-tight">
                 Cada llamada no atendida es un{' '}
                 <span className="text-transparent bg-clip-text" style={{ backgroundImage: 'linear-gradient(135deg, #FF4444 0%, #FF8800 100%)' }}>
-                    cliente que se marcha.
+                    cliente que se marcha a tu competencia.
                 </span>
             </h2>
             <p className="text-white/40 text-sm mb-12 max-w-xl">
@@ -149,7 +202,7 @@ export const PainPoints = () => (
                             background: 'linear-gradient(135deg, rgba(255,68,68,0.06) 0%, rgba(255,255,255,0.01) 100%)',
                             border: '1px solid rgba(255,68,68,0.12)',
                         }}>
-                        <div className="text-3xl mb-3">{pain.emoji}</div>
+                        <div className="text-white/25 mb-3"><pain.Icon /></div>
                         <div className="text-4xl font-black font-mono mb-2" style={{ color: '#FF4444' }}>{pain.stat}</div>
                         <h3 className="font-bold text-white mb-2">{pain.title}</h3>
                         <p className="text-white/40 text-sm leading-relaxed">{pain.description}</p>
@@ -163,37 +216,61 @@ export const PainPoints = () => (
 // ─── 3. FEATURES ───────────────────────────────────────────────────────────────
 const FEATURES = [
     {
-        icon: '🎙️',
+        Icon: () => (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+            </svg>
+        ),
         title: 'Voz natural, no un robot',
         description: 'El agente de Zentrel suena como una persona real. Responde preguntas frecuentes, maneja objeciones básicas y guía al cliente hasta confirmar su cita.',
         tag: 'IA de Voz',
     },
     {
-        icon: '📅',
+        Icon: () => (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+        ),
         title: 'Integración con Google Calendar',
         description: 'Consulta tu disponibilidad real en tiempo real y agenda la cita sin tu intervención. El cliente elige horario y queda registrado automáticamente.',
         tag: 'Google Calendar',
     },
     {
-        icon: '💬',
+        Icon: () => (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+        ),
         title: 'Recordatorios por WhatsApp',
         description: 'El cliente recibe un mensaje de confirmación inmediato y un recordatorio personalizado 24h antes. Cero no-shows, cero llamadas de confirmación manuales.',
         tag: 'WhatsApp',
     },
     {
-        icon: '⚡',
+        Icon: () => (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+        ),
         title: 'Activo en menos de 48 horas',
         description: 'Sin instalaciones complejas. Configuramos tu agente, lo conectamos a tu calendario y número de teléfono. En 48h está funcionando.',
         tag: 'Setup rápido',
     },
     {
-        icon: '🔔',
+        Icon: () => (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            </svg>
+        ),
         title: 'Notificación al instante',
         description: 'Cada vez que se agenda una cita, recibes una notificación inmediata por WhatsApp con los datos del cliente y el horario confirmado.',
         tag: 'Alertas',
     },
     {
-        icon: '📊',
+        Icon: () => (
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+        ),
         title: '100% auditable',
         description: 'Accede a los registros de todas las llamadas gestionadas. Sabe quién llamó, qué pidió y si se agendó correctamente.',
         tag: 'Trazabilidad',
@@ -222,7 +299,7 @@ export const Features = () => (
                             border: '1px solid rgba(255,255,255,0.06)',
                         }}>
                         <div className="flex items-start justify-between">
-                            <span className="text-2xl">{feat.icon}</span>
+                            <span className="text-white/30"><feat.Icon /></span>
                             <span className="text-xs px-2 py-0.5 rounded-full font-medium"
                                 style={{ background: 'rgba(0,204,102,0.1)', color: '#00CC66', border: '1px solid rgba(0,204,102,0.15)' }}>
                                 {feat.tag}
@@ -291,21 +368,38 @@ export const Comparison = () => (
 );
 
 // ─── 5. USE CASES / SECTORS ────────────────────────────────────────────────────
+const CaseIcon1 = () => (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+    </svg>
+);
+const CaseIcon2 = () => (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+    </svg>
+);
+const CaseIcon3 = () => (
+    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+);
+
 const CASES = [
     {
-        icon: '🦷',
+        Icon: CaseIcon1,
         sector: 'Clínicas y Centros de Salud',
         quote: 'Desde que activamos Zentrel, ya no perdemos pacientes por no coger el teléfono durante las consultas. Las citas se agendan solas y los recordatorios por WhatsApp han eliminado casi todos los no-shows.',
         result: '+35% citas agendadas fuera de horario',
     },
     {
-        icon: '💆',
+        Icon: CaseIcon2,
         sector: 'Centros de Estética y Belleza',
         quote: 'Antes pasábamos el día al teléfono interrumpiendo tratamientos. Ahora el agente gestiona todo y nosotras nos centramos en atender a quien ya está delante.',
         result: '0 llamadas perdidas en días de máxima ocupación',
     },
     {
-        icon: '🔧',
+        Icon: CaseIcon3,
         sector: 'Talleres y Servicios Técnicos',
         quote: 'Los clientes llaman para pedir presupuesto y nosotros no podíamos atender. Zentrel recoge el nombre y teléfono y agenda la visita. Perfecto para nosotros.',
         result: '100% de leads recogidos, hasta en fin de semana',
@@ -334,7 +428,7 @@ export const UseCases = () => (
                             border: '1px solid rgba(255,255,255,0.07)',
                         }}>
                         <div>
-                            <div className="text-3xl mb-3">{c.icon}</div>
+                            <div className="text-white/25 mb-3"><c.Icon /></div>
                             <div className="text-xs font-semibold text-white/30 uppercase tracking-widest mb-3">{c.sector}</div>
                             <p className="text-white/60 text-sm leading-relaxed italic mb-5">"{c.quote}"</p>
                         </div>
@@ -374,6 +468,10 @@ const FAQS = [
     {
         q: '¿Puedo cancelar cuando quiera?',
         a: 'Sí. No hay permanencias ni contratos de larga duración. Puedes cancelar al mes siguiente sin penalizaciones.',
+    },
+    {
+        q: '¿Por qué hay un pago de Setup inicial de 499€?',
+        a: 'El setup es un proceso de trabajo real que realizamos a medida para tu negocio. Incluye: la creación y configuración del agente de voz con tu información, el entrenamiento con tus preguntas frecuentes y forma de hablar de tu sector, la integración técnica con tu Google Calendar y tu número de teléfono, la configuración de los mensajes de WhatsApp personalizados y las pruebas de calidad antes del lanzamiento. Es un trabajo de entre 8 y 12 horas que garantiza que el agente funcione correctamente desde el primer día. A diferencia de la suscripción mensual, el setup se paga una sola vez: si el agente ya está entrenado y en funcionamiento, no vuelves a pagarlo, aunque cambies de plan.',
     },
 ];
 

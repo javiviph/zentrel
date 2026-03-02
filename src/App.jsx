@@ -11,6 +11,7 @@ import {
   UseCases,
   FAQ,
   CTABanner,
+  VideoDemo,
 } from './components/Sections';
 
 const Divider = () => (
@@ -39,6 +40,10 @@ function App() {
 
       {/* ── HOW IT WORKS ─────────────────────────── */}
       <HowItWorks />
+      <Divider />
+
+      {/* ── VIDEO DEMO ───────────────────────────── */}
+      <VideoDemo />
       <Divider />
 
       {/* ── PAIN POINTS ──────────────────────────── */}
