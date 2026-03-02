@@ -112,7 +112,14 @@ const RecommendationEngine = ({ estimatedMinutes = 0, calculatorData, onPackSele
                         <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-1" style={{ color: pack.color }}>
                             {pack.name}
                         </h2>
-                        <p className="text-xs text-white/30 mb-4 font-mono">Incluye {pack.included}</p>
+                        <p className="text-xs text-white/30 mb-4 font-mono">
+                            Incluye {pack.included}
+                            {estimatedMinutes > 0 && (
+                                <span className="ml-2 text-white/20">
+                                    · tus llamadas: ~<span className="text-white/40 font-semibold">{estimatedMinutes} min estimados</span>
+                                </span>
+                            )}
+                        </p>
 
                         {/* Dynamic ROI description */}
                         {roi ? (
