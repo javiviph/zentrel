@@ -134,10 +134,18 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                     style={{ background: 'radial-gradient(circle, rgba(0,180,80,0.1) 0%, transparent 70%)' }}></div>
 
                 {/* Section label */}
-                <div className="flex items-center gap-2 mb-8">
+                <div className="flex items-center gap-2 mb-4">
                     <div className="w-1.5 h-4 rounded-full bg-emerald-500"></div>
                     <span className="text-xs font-semibold uppercase tracking-widest text-white/40">Calculadora de Pérdidas</span>
                 </div>
+
+                <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-2 leading-tight">
+                    Descubre cuánto te cuesta<br />
+                    <span style={{ color: '#00CC66' }}>no coger el teléfono.</span>
+                </h2>
+                <p className="text-white/40 text-sm mb-10 max-w-xl">
+                    Ajusta los sliders con los datos de tu negocio y mira cómo se acumula la pérdida mes a mes.
+                </p>
 
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
                     {/* Sliders + Toggle */}
