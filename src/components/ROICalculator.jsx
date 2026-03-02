@@ -147,16 +147,16 @@ const ROICalculator = ({ onCalculate, onInteract }) => {
                         {/* Red Alert Glow */}
                         <div className="absolute inset-0 bg-red-600/10 blur-[60px] rounded-full pointer-events-none transition-all duration-700"></div>
 
-                        <div className="relative bg-black/80 border border-zinc-800/80 rounded-2xl p-8 flex flex-col items-center justify-center text-center shadow-2xl">
-                            <span className="text-zinc-500 uppercase tracking-widest text-xs font-bold mb-4">Estás perdiendo entre</span>
+                        <div className="relative bg-black/80 border border-zinc-800/80 rounded-2xl p-4 sm:p-6 md:p-8 flex flex-col items-center justify-center text-center shadow-2xl w-full">
+                            <span className="text-zinc-500 uppercase tracking-widest text-xs font-bold mb-4 text-center">Estás perdiendo entre</span>
 
-                            <div className="text-4xl md:text-5xl lg:text-6xl font-bold text-red-500 mb-2 font-mono tracking-tighter drop-shadow-lg flex flex-col md:flex-row items-center gap-2">
+                            <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-red-500 mb-2 font-mono tracking-tighter drop-shadow-lg flex flex-wrap justify-center items-center gap-x-3 gap-y-2 w-full break-words">
                                 <AnimatedNumber value={minLoss} />
-                                <span className="text-2xl md:text-4xl text-zinc-400 font-sans px-2">y</span>
+                                <span className="text-xl sm:text-2xl md:text-3xl text-zinc-400 font-sans px-1 shrink-0">y</span>
                                 <AnimatedNumber value={maxLoss} />
                             </div>
 
-                            <span className="text-zinc-500 uppercase tracking-widest text-xs font-bold mt-4">al mes</span>
+                            <span className="text-zinc-500 uppercase tracking-widest text-xs font-bold mt-4 text-center">al mes</span>
                         </div>
                     </div>
                 </div>
