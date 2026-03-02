@@ -320,10 +320,11 @@ export const Comparison = () => (
         <FadeIn>
             <SectionLabel>Comparativa</SectionLabel>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-3">
-                Zentrel vs recepcionista tradicional
+                Tu recepción sin IA<br />
+                <span style={{ color: '#00CC66' }}>vs. tu recepción con Zentrel.</span>
             </h2>
             <p className="text-white/40 text-sm mb-10 max-w-xl">
-                El mismo trabajo. Sin el coste, sin el horario, sin los días libres.
+                No se trata de sustituir a nadie. Se trata de que tu equipo nunca más tenga que elegir entre atender al cliente de delante y coger el teléfono.
             </p>
         </FadeIn>
 
@@ -333,30 +334,30 @@ export const Comparison = () => (
                 <table className="w-full text-sm">
                     <thead>
                         <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}>
-                            <th className="text-left p-5 text-white/40 font-semibold uppercase tracking-wider text-xs">Característica</th>
-                            <th className="p-5 text-white/40 font-semibold uppercase tracking-wider text-xs text-center">Recepcionista Humana</th>
+                            <th className="text-left p-5 text-white/40 font-semibold uppercase tracking-wider text-xs">Situación</th>
+                            <th className="p-5 text-white/40 font-semibold uppercase tracking-wider text-xs text-center">Sin IA</th>
                             <th className="p-5 font-semibold uppercase tracking-wider text-xs text-center rounded-tr-2xl"
                                 style={{ background: 'rgba(0,204,102,0.08)', color: '#00CC66' }}>
-                                Zentrel IA ✦
+                                Con Zentrel ✦
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         {[
-                            ['Coste mensual', '1.200€ – 2.000€ + SS', 'Desde 250€/mes'],
-                            ['Disponibilidad', 'Lun–Vie, 9h–18h', '24h / 7 días / 365 días'],
-                            ['Tiempo de respuesta', 'Variable (tono en espera)', '< 1 segundo'],
-                            ['Agenda citas', '✓ Manual', '✓ Automático (Google Calendar)'],
-                            ['Recordatorio WhatsApp', '✗ No incluido', '✓ Automático'],
-                            ['Vacaciones / Bajas', '✗ Necesitas sustituto', '✓ Nunca para'],
-                            ['Escalabilidad', '1 llamada a la vez', 'Llamadas simultáneas ilimitadas'],
-                        ].map(([feature, human, zentrel], i) => (
+                            ['Llamadas en horario de atención', 'Atendidas por tu equipo', 'Atendidas por tu equipo + IA de respaldo'],
+                            ['Llamadas fuera de horario', 'Sin respuesta, cliente perdido', 'Atendidas y cita agendada automáticamente'],
+                            ['Llamadas mientras se atiende a alguien', 'Pasan al buzón o no se cogen', 'La IA responde al instante en paralelo'],
+                            ['Confirmación de citas', 'Manual, consume tiempo del equipo', 'WhatsApp automático 24h antes'],
+                            ['No-shows', 'Frecuentes sin recordatorio', 'Reducidos hasta un 80%'],
+                            ['Escalabilidad en picos', 'Limitada por el equipo disponible', 'Ilimitada, sin colapso'],
+                            ['Coste adicional', 'Horas extra o personal de refuerzo', 'Desde 250€/mes, sin coste variable'],
+                        ].map(([feature, without, with_zentrel]) => (
                             <tr key={feature} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
                                 <td className="p-4 text-white/60 text-xs font-medium">{feature}</td>
-                                <td className="p-4 text-white/30 text-xs text-center">{human}</td>
+                                <td className="p-4 text-white/30 text-xs text-center">{without}</td>
                                 <td className="p-4 text-xs text-center font-semibold"
                                     style={{ background: 'rgba(0,204,102,0.04)', color: '#00CC66' }}>
-                                    {zentrel}
+                                    {with_zentrel}
                                 </td>
                             </tr>
                         ))}
