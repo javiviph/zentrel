@@ -283,7 +283,7 @@ export const Features = () => (
             <SectionLabel>Qué incluye</SectionLabel>
             <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-3 leading-tight">
                 Todo lo que necesitas.<br />
-                <span style={{ color: '#00CC66' }}>Nada de lo que no necesitas.</span>
+                <span style={{ color: '#00CC66' }}>Sin complicaciones técnicas.</span>
             </h2>
             <p className="text-white/40 text-sm mb-12 max-w-xl">
                 Zentrel se centra en una sola cosa y la hace muy bien: que nunca pierdas una cita por no haber cogido el teléfono.
