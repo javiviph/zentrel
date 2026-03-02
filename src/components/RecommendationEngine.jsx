@@ -112,14 +112,34 @@ const RecommendationEngine = ({ estimatedMinutes = 0, calculatorData, onPackSele
                         <h2 className="text-3xl sm:text-4xl font-black tracking-tight mb-1" style={{ color: pack.color }}>
                             {pack.name}
                         </h2>
-                        <p className="text-xs text-white/30 mb-4 font-mono">
-                            Incluye {pack.included}
-                            {estimatedMinutes > 0 && (
-                                <span className="ml-2 text-white/20">
-                                    · tus llamadas: ~<span className="text-white/40 font-semibold">{estimatedMinutes} min estimados</span>
-                                </span>
-                            )}
-                        </p>
+                        {/* Minutes breakdown */}
+                        {(() => {
+                            const includedMin = parseInt(pack.included); // e.g. 100, 250, 600
+                            const remaining = includedMin - estimatedMinutes;
+                            return (
+                                <div className="rounded-xl overflow-hidden mb-5 text-xs font-mono"
+                                    style={{ border: '1px solid rgba(255,255,255,0.07)' }}>
+                                    <div className="flex justify-between items-center px-4 py-2.5"
+                                        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)', background: 'rgba(255,255,255,0.02)' }}>
+                                        <span className="text-white/40">Minutos incluidos en el plan</span>
+                                        <span className="font-bold text-white/70">{includedMin} min</span>
+                                    </div>
+                                    <div className="flex justify-between items-center px-4 py-2.5"
+                                        style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                        <span className="text-white/40">Uso estimado de tus llamadas</span>
+                                        <span className="font-bold text-white/50">~{estimatedMinutes} min</span>
+                                    </div>
+                                    <div className="flex justify-between items-center px-4 py-2.5">
+                                        <span style={{ color: remaining >= 0 ? pack.color : '#FF4444', opacity: 0.8 }}>
+                                            {remaining >= 0 ? 'Minutos libres de margen' : 'Minutos por encima del plan'}
+                                        </span>
+                                        <span className="font-bold" style={{ color: remaining >= 0 ? pack.color : '#FF4444' }}>
+                                            {remaining >= 0 ? `+${remaining}` : remaining} min
+                                        </span>
+                                    </div>
+                                </div>
+                            );
+                        })()}
 
                         {/* Dynamic ROI description */}
                         {roi ? (
