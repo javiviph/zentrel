@@ -31,7 +31,7 @@ function App() {
 
   return (
     <main
-      className="min-h-screen text-white overflow-x-hidden selection:bg-emerald-500/30 selection:text-white"
+      className="min-h-screen text-white overflow-x-hidden selection:bg-emerald-500/30 selection:text-white dot-grid"
       style={{ background: '#030A06' }}
     >
       {/* ── HERO ─────────────────────────────────── */}

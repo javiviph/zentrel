@@ -99,8 +99,8 @@ input[type="range"]::-moz-range-thumb {
 
 /* Dot grid background */
 .dot-grid {
-  background-image: radial-gradient(circle, rgba(0, 204, 102, 0.12) 1px, transparent 1px);
-  background-size: 32px 32px;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.055) 1px, transparent 1px);
+  background-size: 30px 30px;
 }
 
 /* Noise texture overlay */

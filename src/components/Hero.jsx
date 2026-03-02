@@ -47,7 +47,7 @@ const Hero = () => {
                     ¿Cuánto dinero estás{' '}
                     <span className="relative inline-block">
                         <span className="text-transparent bg-clip-text"
-                            style={{ backgroundImage: 'linear-gradient(135deg, #ff4444 0%, #ff8800 100%)' }}>
+                            style={{ backgroundImage: 'linear-gradient(135deg, #cc2222 0%, #cc3333 100%)' }}>
                             perdiendo
                         </span>
                     </span>
