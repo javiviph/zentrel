@@ -1,5 +1,43 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion as Motion } from 'framer-motion';
+
+const DynamicBadge = () => {
+    // Valores base realistas
+    const [appointments, setAppointments] = useState(1245);
+    const [revenue, setRevenue] = useState(84500);
+
+    useEffect(() => {
+        // Incremento aleatorio simulando actividad real en la plataforma
+        const interval = setInterval(() => {
+            // Se asume un ticket medio aleatorio de entre 45€ y 150€ por nueva cita
+            const newTicket = Math.floor(Math.random() * (150 - 45 + 1) + 45);
+            setAppointments(prev => prev + 1);
+            setRevenue(prev => prev + newTicket);
+        }, 3500); // Cada 3.5 segundos
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const formattedApps = new Intl.NumberFormat('es-ES').format(appointments);
+    const formattedRev = new Intl.NumberFormat('es-ES').format(revenue);
+
+    return (
+        <Motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="relative z-10 mb-7 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-500/25 text-xs font-medium text-emerald-400 tracking-wider transition-all"
+            style={{ background: 'rgba(0,204,102,0.07)' }}
+        >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <div className="flex items-center gap-1.5 sm:gap-2">
+                <span>{formattedApps} citas agendadas</span>
+                <span className="text-white/20">·</span>
+                <span className="font-bold text-emerald-300">{formattedRev}€ recuperados</span>
+            </div>
+        </Motion.div>
+    );
+};
 
 const Hero = () => {
     return (
@@ -23,17 +61,8 @@ const Hero = () => {
                 </a>
             </nav>
 
-            {/* Badge */}
-            <Motion.div
-                initial={{ opacity: 0, y: -8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="relative z-10 mb-7 inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-emerald-500/25 text-xs font-medium text-emerald-400 tracking-wider"
-                style={{ background: 'rgba(0,204,102,0.07)' }}
-            >
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                IA de Recuperación de Ingresos · Activo 24/7
-            </Motion.div>
+            {/* Dynamic Badge */}
+            <DynamicBadge />
 
             {/* Headline */}
             <Motion.div
