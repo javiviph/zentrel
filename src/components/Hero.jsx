@@ -55,7 +55,7 @@ const Hero = () => {
                 </h1>
 
                 <p className="mt-6 text-base sm:text-lg text-white/50 max-w-2xl mx-auto font-light leading-relaxed">
-                    Calcula tu pérdida real en segundos y descubre qué plan de IA puede recuperar tus ingresos automáticamente.
+                    La recepcionista virtual que atiende el 100% de las llamadas, califica leads y agenda citas en tu Calendario. 24/7. Sin contratar personal extra.
                 </p>
             </Motion.div>
 
@@ -70,6 +70,24 @@ const Hero = () => {
                 <svg className="w-5 h-5 text-emerald-500 animate-bounce mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
+            </Motion.div>
+
+            {/* Social Proof */}
+            <Motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 1, duration: 0.8 }}
+                className="relative z-10 mt-20 flex flex-col items-center w-full"
+            >
+                <span className="text-xs font-bold text-white/30 tracking-widest uppercase mb-6">
+                    EMPRESAS QUE YA NO PIERDEN LLAMADAS
+                </span>
+                <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-50 grayscale">
+                    <span className="text-xl md:text-2xl font-black tracking-tighter">NexoClínicas</span>
+                    <span className="text-xl md:text-2xl font-black tracking-tighter">MotorTech</span>
+                    <span className="text-xl md:text-2xl font-black tracking-tighter">DentalStudio</span>
+                    <span className="text-xl md:text-2xl font-black tracking-tighter">BellaBeauty</span>
+                </div>
             </Motion.div>
         </section>
     );
