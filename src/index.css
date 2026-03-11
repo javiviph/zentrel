@@ -113,3 +113,14 @@ input[type="range"]::-moz-range-thumb {
   pointer-events: none;
   z-index: 0;
 }
+
+/* Light Mode Filter Trick - Elegantly inverts design while preserving brand hues */
+.light-theme-filter {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+.light-theme-filter iframe,
+.light-theme-filter img,
+.light-theme-filter video {
+  filter: invert(1) hue-rotate(180deg);
+}
